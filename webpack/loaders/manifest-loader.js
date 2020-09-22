@@ -2,7 +2,6 @@
 
 let fs = require('fs');
 let path = require('path');
-let { getOptions } = require('loader-utils');
 
 async function* walk(dir) {
   for await (const file of await fs.promises.opendir(dir)) {
@@ -14,14 +13,7 @@ async function* walk(dir) {
   }
 }
 
-const processName = (name) => {
-  name = name.replace(/\\/g, '/');
-  name = name.replace(/^\//, '');
-  return name;
-};
-
 module.exports = async function(content, map, meta) {
-  const options = getOptions(this);
   const callback = this.async();
 
   const dir = path.dirname(this.resourcePath);
@@ -29,10 +21,11 @@ module.exports = async function(content, map, meta) {
   const fileMap = {};
   for await (const file of walk(dir)) {
     this.addDependency(file);
-    let name = file.substr(dir.length);
+    let name = path.relative(dir, file);
     name = name.replace(/\\/g, '/');
     name = name.replace(/^\//, '');
 
+    // TODO: also, maybe it'd be better to chain loaders here so we can minify this?
     const fileContents = await fs.promises.readFile(file, { encoding: 'utf8' });
     fileMap[name] = fileContents;
   }
@@ -53,4 +46,3 @@ module.exports = async function(content, map, meta) {
 
   callback(null, contents, map, meta);
 };
-// module.exports.raw = true;
