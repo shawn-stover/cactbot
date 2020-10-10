@@ -1,20 +1,20 @@
 'use strict';
 
 require('../../resources/defaults.css');
-require('../../resources/common.js');
-require('../../resources/content_type.js');
-require('../../resources/party.js');
-require('../../resources/regexes.js');
-require('../../resources/netregexes.js');
-require('../../resources/user_config.js');
-require('../../resources/translations.js');
-require('../../resources/zone_id.js');
-require('../../resources/zone_info.js');
+require('../../resources/common');
+let ContentType = require('../../resources/content_type');
+require('../../resources/party');
+require('../../resources/regexes');
+require('../../resources/netregexes');
+let UserConfig = require('../../resources/user_config');
+require('../../resources/translations');
+require('../../resources/zone_id');
+require('../../resources/zone_info');
 
 require('./oopsy_common.css');
 require('./oopsy_live.css');
-require('./oopsyraidsy_config.js');
-require('./oopsyraidsy.js');
+require('./oopsyraidsy_config');
+require('./oopsyraidsy');
 
 let Options = {
   Triggers: [],

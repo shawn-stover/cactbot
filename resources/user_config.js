@@ -243,3 +243,6 @@ document.addEventListener('onOverlayStateUpdate', (e) => {
   else
     docClassList.add('resizeHandle', 'unlocked');
 });
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = UserConfig;
