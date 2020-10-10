@@ -46,6 +46,7 @@ jobs:
     needs: update-gh-pages
     steps:
       - uses: actions/checkout@v1
+      - run: npm install
       - name: Deploying the static website to gh-pages
         run: npm run build
       - name: magic
