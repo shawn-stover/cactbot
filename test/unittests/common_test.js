@@ -1,6 +1,6 @@
 'use strict';
 
-const { Util, WebSocketThing } = require('../../resources/common.js');
+const { Util } = require('../../resources/common.js');
 
 let assert = require('chai').assert;
 
