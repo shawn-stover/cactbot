@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 class ParseLine {
   static parse(repo, line) {
     let ret;

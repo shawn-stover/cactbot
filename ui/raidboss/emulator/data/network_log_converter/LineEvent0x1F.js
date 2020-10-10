@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Job gauge event
 class LineEvent0x1F extends LineEvent {
   constructor(repo, line, parts) {

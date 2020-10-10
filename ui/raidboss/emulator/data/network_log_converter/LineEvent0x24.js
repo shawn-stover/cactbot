@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Limit gauge event
 class LineEvent0x24 extends LineEvent {
   constructor(repo, line, parts) {

@@ -1,5 +1,14 @@
 'use strict';
 
+const Regexes = require('../../resources/regexes.js');
+const UserConfig = require('../../resources/user_config.js');
+const ZoneId = require('../../resources/zone_id.js');
+const ZoneInfo = require('../../resources/zone_info.js');
+
+require('./eureka_config.js');
+require('../../resources/common.js');
+require('../../resources/weather.js');
+
 let bunnyLabel = {
   en: 'Bunny',
   de: 'Hase',

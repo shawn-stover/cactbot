@@ -1,5 +1,7 @@
 'use strict';
 
+const Tooltip = require('./Tooltip.js');
+
 class ProgressBar {
   constructor(emulator) {
     this.$progressBarTooltip = new Tooltip('.encounterProgressBar', 'bottom', '', false);
@@ -67,3 +69,6 @@ class ProgressBar {
     });
   }
 }
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = ProgressBar;

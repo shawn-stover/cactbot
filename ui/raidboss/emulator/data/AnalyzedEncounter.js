@@ -1,5 +1,7 @@
 'use strict';
 
+const EventBus = require('../EventBus.js');
+
 class AnalyzedEncounter extends EventBus {
   constructor(encounter, emulator) {
     super();

@@ -1,5 +1,41 @@
 'use strict';
 
+const Persistor = require('./emulator/data/Persistor.js');
+const ProgressBar = require('./emulator/ui/ProgressBar.js');
+const RaidEmulator = require('./emulator/data/RaidEmulator.js');
+const Tooltip = require('./emulator/ui/Tooltip.js');
+const UserConfig = require('../../resources/user_config.js');
+
+const LogEventHandler = require('./emulator/data/LogEventHandler.js');
+const EmulatedPartyInfo = require('./emulator/ui/EmulatedPartyInfo.js');
+const EncounterTab = require('./emulator/ui/EncounterTab.js');
+const RaidEmulatorOverlayApiHook = require('./emulator/overrides/RaidEmulatorOverlayApiHook.js');
+const EmulatedMap = require('./emulator/ui/EmulatedMap.js');
+const NetworkLogConverter = require('./emulator/data/NetworkLogConverter.js');
+
+const EmulatorCommon = require('./emulator/EmulatorCommon.js');
+const RaidEmulatorTimelineController = require('./emulator/overrides/RaidEmulatorTimelineController.js');
+const RaidEmulatorTimelineUI = require('./emulator/overrides/RaidEmulatorTimelineUI.js');
+
+// TODO: Cleanup
+require('../../resources/common.js');
+require('../../resources/timerbar.js');
+require('../../resources/widgetlist.js');
+require('./autoplay_helper.js');
+require('./common_replacement.js');
+require('./raidboss_config.js');
+require('./browser_tts_engine.js');
+require('./timeline.js');
+require('./emulator/overrides/RaidEmulatorPopupText.js');
+require('./emulator/data/CombatantJobSearch.js');
+require('./emulator/data/CombatantState.js');
+require('./emulator/data/Combatant.js');
+require('./emulator/data/CombatantTracker.js');
+require('./emulator/data/Encounter.js');
+require('./emulator/data/AnalyzedEncounter.js');
+require('./emulator/data/PopupTextAnalysis.js');
+require('./emulator/data/PersistorEncounter.js');
+
 // @TODO: Some way to not have this be a global?
 
 // See user/raidboss-example.js for documentation.

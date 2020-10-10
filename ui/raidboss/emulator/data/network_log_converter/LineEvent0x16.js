@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Ability hit multiple/no target event
 // Duplicate of 0x15 as far as data
 class LineEvent0x16 extends LineEvent0x15 {

@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Floor waymarker event
 class LineEvent0x1C extends LineEvent {
   constructor(repo, line, parts) {

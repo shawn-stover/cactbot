@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Tether event
 class LineEvent0x23 extends LineEvent {
   constructor(repo, line, parts) {

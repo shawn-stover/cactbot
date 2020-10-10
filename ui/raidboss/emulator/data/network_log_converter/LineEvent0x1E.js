@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Lose status effect event
 // Extend the gain status event to reduce duplicate code since they're
 // the same from a data perspective

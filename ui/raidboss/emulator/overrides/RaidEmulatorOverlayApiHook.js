@@ -1,5 +1,7 @@
 'use strict';
 
+const RaidEmulator = require('../data/RaidEmulator');
+
 class RaidEmulatorOverlayApiHook {
   constructor(emulator) {
     this.emulator = emulator;
@@ -60,3 +62,6 @@ class RaidEmulatorOverlayApiHook {
     return this.originalCall(msg);
   }
 }
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = RaidEmulatorOverlayApiHook;

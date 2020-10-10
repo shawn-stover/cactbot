@@ -947,5 +947,10 @@ class TimelineLoader {
   }
 }
 
-if (typeof module !== 'undefined' && module.exports)
-  module.exports = Timeline;
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    Timeline: Timeline,
+    TimelineController: TimelineController,
+    TimelineUI: TimelineUI,
+  };
+}

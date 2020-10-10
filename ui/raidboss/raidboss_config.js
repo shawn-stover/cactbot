@@ -1,5 +1,6 @@
 'use strict';
 
+const Regexes = require('../../resources/regexes.js');
 const UserConfig = require('../../resources/user_config.js');
 
 // No sound only option, because that's silly.

@@ -1,5 +1,9 @@
 'use strict';
 
+const ContentType = require('../../resources/content_type.js');
+const Util = require('../../resources/common.js');
+const ZoneInfo = require('../../resources/zone_info.js');
+
 let Options = {
   Language: 'en',
   IgnoreContentTypes: [

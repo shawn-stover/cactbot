@@ -1,5 +1,8 @@
 'use strict';
 
+const { TimelineController } = require('../../timeline.js');
+const RaidEmulatorTimeline = require('./RaidEmulatorTimeline.js');
+
 class RaidEmulatorTimelineController extends TimelineController {
   bindTo(emulator) {
     this.emulator = emulator;
@@ -46,3 +49,6 @@ class RaidEmulatorTimelineController extends TimelineController {
     });
   }
 }
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = RaidEmulatorTimelineController;

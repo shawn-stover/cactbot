@@ -1,5 +1,8 @@
 'use strict';
 
+const { LocaleNetRegex } = require('../../../resources/translations.js');
+const NetRegexes = require('../../../resources/netregexes.js');
+
 class EmulatorCommon {
   static cloneData(data, exclude = ['options', 'party']) {
     let ret;
@@ -116,3 +119,6 @@ for (let lang in LocaleNetRegex.areaSeal) {
 EmulatorCommon.wipeRegex = NetRegexes.network6d({ command: '40000010' });
 EmulatorCommon.winRegex = NetRegexes.network6d({ command: '40000003' });
 EmulatorCommon.cactbotWipeRegex = NetRegexes.echo({ line: 'cactbot wipe.*?' });
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = EmulatorCommon;

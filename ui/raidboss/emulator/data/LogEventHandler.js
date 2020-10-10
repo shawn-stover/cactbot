@@ -1,5 +1,7 @@
 'use strict';
 
+const EventBus = require('../EventBus.js');
+
 class LogEventHandler extends EventBus {
   static doesLineMatch(line, regexes) {
     for (let i in regexes) {
@@ -107,3 +109,6 @@ Line Count: ${this.currentFight.length}
     this.currentFight = [];
   }
 }
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = LogEventHandler;

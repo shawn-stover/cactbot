@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // DoT/HoT event
 class LineEvent0x18 extends LineEvent {
   constructor(repo, line, parts) {

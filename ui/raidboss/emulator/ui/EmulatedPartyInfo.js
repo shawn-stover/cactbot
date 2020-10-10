@@ -1,5 +1,8 @@
 'use strict';
 
+const EventBus = require('../EventBus.js');
+const Tooltip = require('./Tooltip.js');
+
 class EmulatedPartyInfo extends EventBus {
   constructor(emulator) {
     super();
@@ -307,3 +310,6 @@ EmulatedPartyInfo.jobOrder = [
   'BRD', 'MCH', 'DNC',
   'BLM', 'SMN', 'RDM',
   'BLU'];
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = EmulatedPartyInfo;

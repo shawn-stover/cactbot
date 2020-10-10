@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Network update hp event
 class LineEvent0x27 extends LineEvent {
   constructor(repo, line, parts) {

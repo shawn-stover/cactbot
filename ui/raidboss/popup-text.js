@@ -1,5 +1,8 @@
 'use strict';
 
+const Regexes = require('../../resources/regexes.js');
+const ZoneId = require('../../resources/zone_id.js');
+
 // There should be (at most) six lines of instructions.
 const raidbossInstructions = {
   en: [
@@ -896,3 +899,10 @@ class PopupTextGenerator {
 }
 
 let gPopupText;
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    PopupText: PopupText,
+    PopupTextGenerator: PopupTextGenerator,
+  };
+}

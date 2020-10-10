@@ -1,5 +1,12 @@
 'use strict';
 
+
+const UserConfig = require('../../../resources/user_config.js');
+
+require('./dps_phase_tracker.js');
+require('../dps_common.js');
+require('../../../resources/zone_id.js');
+
 let rows = 10;
 let rdpsMax = 0;
 

@@ -1,5 +1,7 @@
 'use strict';
 
+const { TimelineUI } = require('../../timeline.js');
+
 class RaidEmulatorTimelineUI extends TimelineUI {
   constructor(options) {
     super(options);
@@ -141,3 +143,6 @@ class RaidEmulatorTimelineUI extends TimelineUI {
     }
   }
 }
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = RaidEmulatorTimelineUI;

@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Head marker event
 class LineEvent0x1B extends LineEvent {
   constructor(repo, line, parts) {

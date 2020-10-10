@@ -1,5 +1,7 @@
 'use strict';
 
+const LogRepository = require('./network_log_converter/LogRepository.js');
+
 class NetworkLogConverter {
   constructor(Options) {
     this.EnableProperCaseBug = true;
@@ -32,3 +34,6 @@ class NetworkLogConverter {
 }
 
 NetworkLogConverter.lineSplitRegex = /\r?\n/gm;
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = NetworkLogConverter;

@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Ability hit single target event
 class LineEvent0x15 extends LineEvent {
   constructor(repo, line, parts) {

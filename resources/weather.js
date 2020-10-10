@@ -1,5 +1,8 @@
 'use strict';
 
+const gWeatherRates = require('./weather_rate.js');
+const ZoneInfo = require('./zone_info');
+
 function getWeather(timeMs, zoneId) {
   let chance = getWeatherChanceValue(timeMs);
 

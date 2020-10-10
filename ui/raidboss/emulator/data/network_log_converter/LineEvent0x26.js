@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Network status effect event
 class LineEvent0x26 extends LineEvent {
   constructor(repo, line, parts) {

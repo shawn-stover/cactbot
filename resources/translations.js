@@ -1,24 +1,10 @@
 'use strict';
 
+const Regexes = require('./regexes.js');
+const NetRegexes = require('./netregexes.js');
+
 let LocaleRegex = {};
 let LocaleNetRegex = {};
-
-// TODO: figure out some non-var way to require files for node, but not break html includes.
-/* eslint-disable no-var */
-var Regexes;
-var NetRegexes;
-/* eslint-enable */
-
-if (typeof module !== 'undefined') {
-  if (module.exports) {
-    module.exports = {
-      LocaleRegex: LocaleRegex,
-      LocaleNetRegex: LocaleNetRegex,
-    };
-  }
-  Regexes = require('./regexes.js');
-  NetRegexes = require('./netregexes.js');
-}
 
 // Fill in LocaleRegex so that things like LocaleRegex.countdownStart.de is a valid regex.
 (() => {
@@ -134,3 +120,10 @@ if (typeof module !== 'undefined') {
     }
   }
 })();
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    LocaleRegex: LocaleRegex,
+    LocaleNetRegex: LocaleNetRegex,
+  };
+}

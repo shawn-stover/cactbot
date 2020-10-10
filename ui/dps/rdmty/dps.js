@@ -1,3 +1,10 @@
+'use strict';
+
+require('../dps_common.js');
+require('../../../resources/common.js');
+require('../../../resources/lib/lodash.min.js');
+require('../../../resources/lib/react.min.js');
+
 // fiddle: http://jsfiddle.net/v1ddnsvh/8/
 /* global window */
 

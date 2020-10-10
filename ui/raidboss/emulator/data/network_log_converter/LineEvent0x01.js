@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Zone change event
 class LineEvent0x01 extends LineEvent {
   constructor(repo, line, parts) {

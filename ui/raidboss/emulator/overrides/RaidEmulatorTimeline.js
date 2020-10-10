@@ -1,5 +1,7 @@
 'use strict';
 
+const { Timeline } = require('../../timeline.js');
+
 class RaidEmulatorTimeline extends Timeline {
   constructor(text, replacements, triggers, styles, options) {
     super(text, replacements, triggers, styles, options);
@@ -42,3 +44,6 @@ class RaidEmulatorTimeline extends Timeline {
     this.emulatedFightSyncLastOffset = this.emulatedTimeOffset;
   }
 }
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = RaidEmulatorTimeline;

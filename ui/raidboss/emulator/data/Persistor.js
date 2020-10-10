@@ -1,5 +1,7 @@
 'use strict';
 
+const EventBus = require('../EventBus.js');
+
 class Persistor extends EventBus {
   constructor() {
     super();
@@ -230,3 +232,6 @@ class Persistor extends EventBus {
 }
 
 Persistor.dbVersion = 3;
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = Persistor;

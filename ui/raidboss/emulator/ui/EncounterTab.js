@@ -1,5 +1,7 @@
 'use strict';
 
+const EventBus = require('../EventBus.js');
+
 class EncounterTab extends EventBus {
   constructor(persistor) {
     super();
@@ -183,3 +185,6 @@ class EncounterTab extends EventBus {
     }
   }
 }
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = EncounterTab;

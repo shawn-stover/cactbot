@@ -1,5 +1,7 @@
 'use strict';
 
+const EventBus = require('../EventBus.js');
+
 class RaidEmulator extends EventBus {
   constructor() {
     super();
@@ -120,3 +122,6 @@ class RaidEmulator extends EventBus {
 }
 
 RaidEmulator.playbackSpeed = 10;
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = RaidEmulator;

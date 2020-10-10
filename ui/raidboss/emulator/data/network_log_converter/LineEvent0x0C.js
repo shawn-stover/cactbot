@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Player stats event
 class LineEvent0x0C extends LineEvent {
   constructor(repo, line, parts) {

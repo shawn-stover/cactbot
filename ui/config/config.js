@@ -1,5 +1,16 @@
 'use strict';
 
+const UserConfig = require('../../resources/user_config.js');
+
+// TODO: Cleanup
+require('../../resources/common.js');
+require('../../resources/zone_id.js');
+require('../../resources/regexes.js');
+require('../../resources/netregexes.js');
+require('../../resources/conditions.js');
+require('../../resources/responses.js');
+require('../../resources/party.js');
+
 let Options = {};
 let gConfig = null;
 

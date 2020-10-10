@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Chat event
 class LineEvent0x00 extends LineEvent {
   constructor(repo, line, parts) {

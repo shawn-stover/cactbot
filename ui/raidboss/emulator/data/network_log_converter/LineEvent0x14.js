@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Ability use event
 class LineEvent0x14 extends LineEvent {
   constructor(repo, line, parts) {

@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Nameplate toggle
 class LineEvent0x22 extends LineEvent {
   constructor(repo, line, parts) {

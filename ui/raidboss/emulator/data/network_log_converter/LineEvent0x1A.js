@@ -1,5 +1,7 @@
 'use strict';
 
+const LineEvent = require('./LineEvent.js');
+
 // Gain status effect event
 class LineEvent0x1A extends LineEvent {
   constructor(repo, line, parts) {

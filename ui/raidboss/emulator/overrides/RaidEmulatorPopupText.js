@@ -1,5 +1,7 @@
 'use strict';
 
+const StubbedPopupText = require('../overrides/StubbedPopupText.js');
+
 class RaidEmulatorPopupText extends StubbedPopupText {
   constructor(options) {
     super(options);

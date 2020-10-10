@@ -1,5 +1,7 @@
 'use strict';
 
+const StubbedPopupText = require('../overrides/StubbedPopupText.js');
+
 class PopupTextAnalysis extends StubbedPopupText {
   OnTriggerInternal(trigger, matches) {
     this.currentTriggerStatus = {

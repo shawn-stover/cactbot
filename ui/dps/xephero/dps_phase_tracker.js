@@ -1,5 +1,7 @@
 'use strict';
 
+const { LocaleRegex } = require('../../../resources/translations.js');
+
 let kTestPhaseStart = 'cactbot phase start';
 let kTestPhaseEnd = 'cactbot phase end';
 
