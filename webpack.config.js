@@ -3,6 +3,8 @@
 const path = require('path');
 
 module.exports = {
+  mode: 'development',
+  devtool: 'none',
   entry: {
     config: './ui/config/config.js',
     rdmty: './ui/dps/rdmty/dps.js',
