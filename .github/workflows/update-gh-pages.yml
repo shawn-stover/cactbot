@@ -41,3 +41,12 @@ jobs:
               sha: context.sha,
               force: true
             })
+  build-gh-pages:
+    runs-on: ubuntu-latest
+    needs: update-gh-pages
+    steps:
+      - uses: actions/checkout@v1
+      - name: Deploying the static website to gh-pages
+        run: npm run build
+      - name: magic
+        run: git push origin `git subtree split --prefix dist main`:gh-pages --force
