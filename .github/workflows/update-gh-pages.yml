@@ -50,4 +50,4 @@ jobs:
       - name: Deploying the static website to gh-pages
         run: npm run build
       - name: magic
-        run: git push origin `git subtree split --prefix dist main`:gh-pages --force
+        run: npm run deploy
