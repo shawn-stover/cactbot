@@ -10,7 +10,7 @@ module.exports = {
     // eureka: './ui/eureka/eureka.js',
     // fisher: './ui/fisher/fisher.js',
     // jobs: './ui/jobs/jobs.js',
-    // oopsyraidsy: './ui/oopsyraidsy/oopsyraidsy.js',
+    oopsyraidsy: './ui/oopsyraidsy/oopsyraidsy.js',
     // pullcounter: './ui/pullcounter/pullcounter.js',
     // radar: './ui/radar/radar.js',
     // raidboss: './ui/raidboss/raidboss.js',
