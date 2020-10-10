@@ -44,12 +44,14 @@ jobs:
   build-gh-pages:
     runs-on: ubuntu-latest
     needs: update-gh-pages
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v1
       - run: npm install
       - name: Deploying the static website to gh-pages
         run: npm run build
       - name: magic
-        run: npm run deploy
+        run: git add dist --force
+      - name: magic 2
+        run: git commit -m "gh-pages build"
+      - name: magic 3
+        run: git subtree push --prefix dist origin gh-pages
