@@ -1,7 +1,6 @@
 'use strict';
 
 require('../../resources/common.js');
-require('../../resources/defaults.css');
 
 addOverlayListener('ChangeZone', function(e) {
   document.getElementById('currentZone').innerText = `currentZone: ${e.zoneName} (${e.zoneID})`;

@@ -1,5 +1,11 @@
 'use strict';
 
+const UserConfig = require('../../resources/user_config.js');
+
+require('./fisher-ui.js');
+require('./seabase.js');
+require('../../resources/common.js');
+
 let Options = {
   IQRHookQuantity: 100,
   IQRTugQuantity: 10,

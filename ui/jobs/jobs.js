@@ -1,5 +1,23 @@
 'use strict';
 
+const ContentType = require('../../resources/content_type.js');
+const EffectId = require('../../resources/effect_id.js');
+const { LocaleRegex } = require('../../resources/translations.js');
+const Regexes = require('../../resources/regexes.js');
+const NetRegexes = require('../../resources/netregexes.js');
+const UserConfig = require('../../resources/user_config.js');
+const { Util } = require('../../resources/common.js');
+const ZoneInfo = require('../../resources/zone_info.js');
+const ZoneId = require('../../resources/zone_id.js');
+
+// TODO: Confused
+require('./jobs_config.js');
+require('../../resources/resourcebar.js');
+require('../../resources/timerbar.js');
+require('../../resources/timerbox.js');
+require('../../resources/timericon.js');
+require('../../resources/widgetlist.js');
+
 const kWellFedContentTypes = [
   ContentType.Dungeons,
   ContentType.Trials,

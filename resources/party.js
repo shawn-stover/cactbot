@@ -1,5 +1,7 @@
 'use strict';
 
+const { Util } = require('../../resources/common.js');
+
 class PartyTracker {
   constructor() {
     this.onPartyChanged({ party: [] });
@@ -137,3 +139,6 @@ class PartyTracker {
     return this.idToName_[id];
   }
 }
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = PartyTracker;

@@ -1,20 +1,17 @@
 'use strict';
 
-require('../../resources/defaults.css');
-require('../../resources/common');
-let ContentType = require('../../resources/content_type');
-require('../../resources/party');
-require('../../resources/regexes');
-require('../../resources/netregexes');
-let UserConfig = require('../../resources/user_config');
-require('../../resources/translations');
-require('../../resources/zone_id');
-require('../../resources/zone_info');
+const ContentType = require('../../resources/content_type.js');
+const { LocaleNetRegex } = require('../../resources/translations.js');
+const NetRegexes = require('../../resources/netregexes.js');
+const PartyTracker = require('../../resources/party.js');
+const Regexes = require('../../resources/regexes.js');
+const UserConfig = require('../../resources/user_config.js');
+const { Util } = require('../../resources/common.js');
+const ZoneId = require('../../resources/zone_id.js');
+const ZoneInfo = require('../../resources/zone_info.js');
 
-require('./oopsy_common.css');
-require('./oopsy_live.css');
+// TODO: Confused
 require('./oopsyraidsy_config');
-require('./oopsyraidsy');
 
 let Options = {
   Triggers: [],

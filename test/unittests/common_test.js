@@ -1,7 +1,6 @@
 'use strict';
 
-let commonModule = require('../../resources/common.js');
-let Util = commonModule.util;
+const { Util, WebSocketThing } = require('../../resources/common.js');
 
 let assert = require('chai').assert;
 

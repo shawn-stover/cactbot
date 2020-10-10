@@ -1,5 +1,7 @@
 'use strict';
 
+const TimerBar = require('../../resources/timerbar.js');
+
 class FisherBar extends TimerBar {
   stop() {
     cancelAnimationFrame(this._animationFrame);

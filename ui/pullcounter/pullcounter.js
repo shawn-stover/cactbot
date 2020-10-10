@@ -1,10 +1,14 @@
 'use strict';
 
+const _ = require('../../resources/common.js');
+const { LocaleRegex } = require('../../resources/translations.js');
+const Regexes = require('../../resources/regexes.js');
+const UserConfig = require('../../resources/user_config.js');
+const ZoneId = require('../../resources/zone_id.js');
+
 let Options = {
   Language: 'en',
 };
-
-'use strict';
 
 // NOTE: do not add more fights to this data structure.
 // These exist for testing pullcounter and for backwards compatibility

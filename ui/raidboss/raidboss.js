@@ -1,5 +1,26 @@
 'use strict';
 
+const aa = require('../../resources/zone_id.js');
+const ab = require('../../resources/party.js');
+const ac = require('../../resources/regexes.js');
+const ad = require('../../resources/netregexes.js');
+const ae = require('../../resources/conditions.js');
+const af = require('../../resources/player_override.js');
+const ag = require('../../resources/responses.js');
+const ah = require('../../resources/translations.js');
+const aj = require('../../resources/widgetlist.js');
+const UserConfig = require('../../resources/user_config.js');
+
+const a = require('./common_replacement.js');
+const b = require('./raidboss_config.js');
+const c = require('./timeline.js');
+const d = require('./browser_tts_engine.js');
+const e = require('./autoplay_helper.js');
+const f = require('./popup-text.js');
+require('../../resources/common.js');
+require('../../resources/timerbar.js');
+
+
 // See user/raidboss-example.js for documentation.
 let Options = {
   // These options are ones that are not auto-defined by raidboss_config.js.

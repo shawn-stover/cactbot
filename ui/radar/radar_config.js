@@ -1,5 +1,7 @@
 'use strict';
 
+const UserConfig = require('../../resources/user_config.js');
+
 UserConfig.registerOptions('radar', {
   options: [
     {

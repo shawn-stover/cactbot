@@ -1,5 +1,12 @@
 'use strict';
 
+const gMonster = require('../../resources/hunt.js');
+const NetRegexes = require('../../resources/netregexes.js');
+const UserConfig = require('../../resources/user_config.js');
+
+require('./radar_config.js');
+require('../../resources/common.js');
+
 let Options = {
   PopSound: '../../resources/sounds/PowerAuras/sonar.ogg',
   RankOptions: {

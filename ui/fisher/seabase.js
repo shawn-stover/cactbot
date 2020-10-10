@@ -1,5 +1,7 @@
 'use strict';
 
+const gFisherData = require('./static-data.js');
+
 class SeaBase {
   constructor() {
     this._dbName = 'seabase';
