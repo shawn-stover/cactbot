@@ -1,6 +1,6 @@
 'use strict';
 
-const { Util } = require('../../resources/common.js');
+const { Util } = require('./common.js');
 
 class PartyTracker {
   constructor() {
