@@ -47,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: heads/gh-pages
+          ref: gh-pages
       - run: npm install
       - name: Deploying the static website to gh-pages
         run: npm run build
@@ -60,4 +60,4 @@ jobs:
       - name: magic 2
         run: git commit -m "gh-pages build"
       - name: magic 3
-        run: git subtree push --prefix dist origin gh-pages
+        run: git subtree push --prefix dist origin gh-pages --force
