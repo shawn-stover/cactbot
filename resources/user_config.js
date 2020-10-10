@@ -73,7 +73,7 @@ let UserConfig = {
       let userOptions = await readOptions || {};
       this.savedConfig = userOptions.data || {};
       this.processOptions(
-          Options,
+          options,
           this.savedConfig[overlayName] || {},
           this.optionTemplates[overlayName],
       );
