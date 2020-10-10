@@ -60,4 +60,4 @@ jobs:
       - name: magic 2
         run: git commit -m "gh-pages build"
       - name: magic 3
-        run: git subtree push --prefix dist origin gh-pages --force
+        run: git push origin `git subtree split --prefix dist main`:gh-pages --force
