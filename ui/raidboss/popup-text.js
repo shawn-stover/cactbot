@@ -1,17 +1,17 @@
 'use strict';
 
-// Absolutely necessary for literally everything
+// Used by downstream eval
 const NetRegexes = require('../../resources/netregexes.js');
 const Conditions = require('../../resources/conditions.js');
 const { Responses } = require('../../resources/responses.js');
 const { BrowserTTSEngine } = require('./browser_tts_engine.js');
 
 const AutoplayHelper = require('./autoplay_helper.js');
-const Regexes = require('../../resources/regexes.js');
-const ZoneId = require('../../resources/zone_id.js');
-const PartyTracker = require('../../resources/party.js');
-const { Util } = require('../../resources/common.js');
 const { addPlayerChangedOverrideListener } = require('../../resources/player_override.js');
+const PartyTracker = require('../../resources/party.js');
+const Regexes = require('../../resources/regexes.js');
+const { Util } = require('../../resources/common.js');
+const ZoneId = require('../../resources/zone_id.js');
 
 // There should be (at most) six lines of instructions.
 const raidbossInstructions = {

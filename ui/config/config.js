@@ -9,6 +9,7 @@ const Regexes = require('../../resources/regexes.js');
 const { Responses } = require('../../resources/responses.js');
 const ZoneId = require('../../resources/zone_id.js');
 
+// Load other config files
 require('./general_config.js');
 require('../eureka/eureka_config.js');
 require('../jobs/jobs_config.js');
@@ -199,15 +200,6 @@ class CactbotConfigurator {
     this.lang = configOptions.DisplayLanguage || configOptions.ShortLocale;
     this.savedConfig = savedConfig || {};
     this.developerOptions = this.getOption('general', 'ShowDeveloperOptions', false);
-
-    // for (let filename in configFiles) {
-    //   try {
-    //     eval(configFiles[filename]);
-    //   } catch (exception) {
-    //     console.error('Error parsing JSON from ' + filename + ': ' + exception);
-    //     continue;
-    //   }
-    // }
 
     let templates = UserConfig.optionTemplates;
     for (let group in templates) {

@@ -11,7 +11,9 @@ let Regexes = require('../../resources/regexes.js');
 let NetRegexes = require('../../resources/netregexes.js');
 let Conditions = require('../../resources/conditions.js');
 let ZoneId = require('../../resources/zone_id.js');
-let { Responses, triggerFunctions } = require('../../resources/responses.js');
+let responseExports = require('../../resources/responses.js');
+let Responses = responseExports.Responses;
+let triggerFunctions = responseExports.triggerFunctions;
 let fs = require('fs');
 
 let exitCode = 0;
