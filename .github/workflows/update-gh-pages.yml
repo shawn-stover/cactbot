@@ -38,9 +38,9 @@ jobs:
           # TODO: FIX THIS!!!
           script: |
             if (${{ github.repository }} === 'panicstevenson/cactbot') {
-              core.setOutput('token', "${{ secrets.USER_TOKEN" }}");
+              core.setOutput('token', "${{ secrets.USER_TOKEN }}");
             } else {
-              core.setOutput('token', "${{ secrets.GITHUB_TOKEN" }}");
+              core.setOutput('token', "${{ secrets.GITHUB_TOKEN }}");
             }
       - uses: actions/checkout@v2
         with:
