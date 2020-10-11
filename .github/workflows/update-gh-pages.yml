@@ -37,7 +37,7 @@ jobs:
           # Sets up token for commit
           # TODO: FIX THIS!!!
           script: |
-            if (${{ github.repository }} === 'panicstevenson/cactbot') {
+            if ("${{ github.repository }}" === 'panicstevenson/cactbot') {
               core.setOutput('token', "${{ secrets.USER_TOKEN }}");
             } else {
               core.setOutput('token', "${{ secrets.GITHUB_TOKEN }}");
