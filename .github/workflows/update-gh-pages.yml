@@ -46,15 +46,12 @@ jobs:
     needs: update-gh-pages
     steps:
       - uses: actions/checkout@v2
+        token: ${{ secrets.USER_TOKEN }} # TODO: Make sure this gets changed!!!!!!
         with:
           ref: gh-pages
       - run: npm install
       - name: Deploying the static website to gh-pages
         run: npm run build
-      - name: git setup
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
       - name: magic
         run: git add dist --force
       - name: magic 2
