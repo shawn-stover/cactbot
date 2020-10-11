@@ -103,13 +103,6 @@ UserConfig.getUserConfigLocation('raidboss', Options, function(e) {
   if (!Options.TimelineEnabled)
     container.classList.add('hide-timeline');
 
-  gTimelineController = new TimelineController(Options, new TimelineUI(Options));
-  gPopupText = new PopupText(Options);
-  // Connect the timelines to the popup text, if alerts are desired.
-  if (Options.AlertsEnabled)
-    gTimelineController.SetPopupTextInterface(new PopupTextGenerator(gPopupText));
-  gPopupText.SetTimelineLoader(new TimelineLoader(gTimelineController));
-
   callOverlayHandler({
     call: 'cactbotReadDataFiles',
     source: location.href,
@@ -118,6 +111,13 @@ UserConfig.getUserConfigLocation('raidboss', Options, function(e) {
     gPopupText.OnDataFilesRead(e);
     gPopupText.ReloadTimelines();
   });
+
+  gTimelineController = new TimelineController(Options, new TimelineUI(Options));
+  gPopupText = new PopupText(Options);
+  // Connect the timelines to the popup text, if alerts are desired.
+  if (Options.AlertsEnabled)
+    gTimelineController.SetPopupTextInterface(new PopupTextGenerator(gPopupText));
+  gPopupText.SetTimelineLoader(new TimelineLoader(gTimelineController));
 
   addOverlayListener('onLogEvent', function(e) {
     gTimelineController.OnLogEvent(e);

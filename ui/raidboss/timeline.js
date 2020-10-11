@@ -1,10 +1,8 @@
 'use strict';
 
-const path = require('path');
 const { commonReplacement } = require('./common_replacement.js');
 const Regexes = require('../../resources/regexes.js');
-const NetRegexes = require('../../resources/netregexes.js');
-const { LocaleNetRegex, LocaleRegex } = require('../../resources/translations.js');
+const { LocaleRegex } = require('../../resources/translations.js');
 
 const timelineInstructions = {
   en: [

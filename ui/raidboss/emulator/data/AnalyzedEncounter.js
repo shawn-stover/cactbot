@@ -9,7 +9,6 @@ const PopupTextAnalysis = require('../data/PopupTextAnalysis.js');
 const { TimelineLoader } = require('../../timeline.js');
 const { Util } = require('../../../../resources/common.js');
 
-
 class AnalyzedEncounter extends EventBus {
   constructor(options, encounter, emulator) {
     super();
