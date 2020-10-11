@@ -10,7 +10,7 @@ plugin/**/*.csproj.user
 
 plugin/ThirdParty/
 publish/
-__pycache__
+dist/
 node_modules
 package-lock.json
 .idea/*
@@ -19,4 +19,13 @@ package-lock.json
 *.swp
 .DS_Store
 util/DEPS.cache
-dist
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+# Environments
+.env
+.venv
+env/
+venv/
