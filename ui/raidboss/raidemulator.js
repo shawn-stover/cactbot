@@ -16,25 +16,13 @@ const NetworkLogConverter = require('./emulator/data/NetworkLogConverter.js');
 const EmulatorCommon = require('./emulator/EmulatorCommon.js');
 const RaidEmulatorTimelineController = require('./emulator/overrides/RaidEmulatorTimelineController.js');
 const RaidEmulatorTimelineUI = require('./emulator/overrides/RaidEmulatorTimelineUI.js');
+const RaidEmulatorPopupText = require('./emulator/overrides/RaidEmulatorPopupText.js');
 
-// TODO: Cleanup
+const { PopupTextGenerator } = require('./popup-text.js');
+const { TimelineLoader } = require('./timeline.js');
+
 require('../../resources/common.js');
-require('../../resources/timerbar.js');
-require('../../resources/widgetlist.js');
-require('./autoplay_helper.js');
-require('./common_replacement.js');
 require('./raidboss_config.js');
-require('./browser_tts_engine.js');
-require('./timeline.js');
-require('./emulator/overrides/RaidEmulatorPopupText.js');
-require('./emulator/data/CombatantJobSearch.js');
-require('./emulator/data/CombatantState.js');
-require('./emulator/data/Combatant.js');
-require('./emulator/data/CombatantTracker.js');
-require('./emulator/data/Encounter.js');
-require('./emulator/data/AnalyzedEncounter.js');
-require('./emulator/data/PopupTextAnalysis.js');
-require('./emulator/data/PersistorEncounter.js');
 
 // @TODO: Some way to not have this be a global?
 

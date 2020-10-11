@@ -1,10 +1,9 @@
 'use strict';
 
-
+const DpsPhaseTracker = require('./dps_phase_tracker.js');
+const { InitDpsModule, Options } = require('../dps_common.js');
 const UserConfig = require('../../../resources/user_config.js');
 
-require('./dps_phase_tracker.js');
-require('../dps_common.js');
 require('../../../resources/zone_id.js');
 
 let rows = 10;
