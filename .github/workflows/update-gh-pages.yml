@@ -43,17 +43,9 @@ jobs:
       - name: magic 2
         run: git commit -m "gh-pages build"
       - name: Update gh-pages
-        uses: actions/github-script@v2
         if: steps.check-gh-pages.outputs.found == 'true'
-        with:
-          script: |
-            github.git.updateRef({
-              owner: "${{ steps.setup-vars.outputs.owner }}",
-              repo: "${{ steps.setup-vars.outputs.repo }}",
-              ref: "heads/gh-pages",
-              sha: context.sha,
-              force: true
-            })
+        run: |
+          git push gh-pages --force
   # build-gh-pages:
   #   runs-on: ubuntu-latest
   #   needs: update-gh-pages
