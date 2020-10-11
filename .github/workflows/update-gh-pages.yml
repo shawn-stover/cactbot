@@ -53,6 +53,10 @@ jobs:
           npm run build
       - name: magic
         run: git add dist --force
+      - name: git setup
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
       - name: magic 2
         run: git commit --amend
       - name: Update gh-pages
