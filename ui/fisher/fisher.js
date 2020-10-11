@@ -1,9 +1,9 @@
 'use strict';
 
+const FisherUI = require('./fisher-ui.js');
+const SeaBase = require('./seabase.js');
 const UserConfig = require('../../resources/user_config.js');
 
-require('./fisher-ui.js');
-require('./seabase.js');
 require('../../resources/common.js');
 
 let Options = {
@@ -146,7 +146,7 @@ class Fisher {
     };
 
     this.ui = new FisherUI(element);
-    this.seaBase = new SeaBase();
+    this.seaBase = new SeaBase(Options);
   }
 
   getActiveBait() {
