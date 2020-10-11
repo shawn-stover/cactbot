@@ -2236,7 +2236,7 @@ class EurekaTracker {
   }
 }
 
-UserConfig.getUserConfigLocation('eureka', function(e) {
+UserConfig.getUserConfigLocation('eureka', Options, function(e) {
   addOverlayListener('onPlayerChangedEvent', function(e) {
     gTracker.OnPlayerChange(e);
   });

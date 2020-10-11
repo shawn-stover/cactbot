@@ -1,6 +1,6 @@
 'use strict';
 
-const UserConfig = require('../../resources/user_config');
+const UserConfig = require('../../resources/user_config.js');
 
 const oopsyHelpers = [
   'damageWarn',

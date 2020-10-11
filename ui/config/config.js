@@ -2,14 +2,21 @@
 
 const UserConfig = require('../../resources/user_config.js');
 
-// TODO: Cleanup
+// Used by downstream eval
+const ZoneId = require('../../resources/zone_id.js');
+const NetRegexes = require('../../resources/netregexes.js');
+const Regexes = require('../../resources/regexes.js');
+const Conditions = require('../../resources/conditions.js');
+const { Responses } = require('../../resources/responses.js');
+
+require('./general_config.js');
+require('../eureka/eureka_config.js');
+require('../jobs/jobs_config.js');
+require('../oopsyraidsy/oopsyraidsy_config.js');
+require('../radar/radar_config.js');
+require('../raidboss/raidboss_config.js');
+
 require('../../resources/common.js');
-require('../../resources/zone_id.js');
-require('../../resources/regexes.js');
-require('../../resources/netregexes.js');
-require('../../resources/conditions.js');
-require('../../resources/responses.js');
-require('../../resources/party.js');
 
 let Options = {};
 let gConfig = null;
@@ -193,14 +200,14 @@ class CactbotConfigurator {
     this.savedConfig = savedConfig || {};
     this.developerOptions = this.getOption('general', 'ShowDeveloperOptions', false);
 
-    for (let filename in configFiles) {
-      try {
-        eval(configFiles[filename]);
-      } catch (exception) {
-        console.error('Error parsing JSON from ' + filename + ': ' + exception);
-        continue;
-      }
-    }
+    // for (let filename in configFiles) {
+    //   try {
+    //     eval(configFiles[filename]);
+    //   } catch (exception) {
+    //     console.error('Error parsing JSON from ' + filename + ': ' + exception);
+    //     continue;
+    //   }
+    // }
 
     let templates = UserConfig.optionTemplates;
     for (let group in templates) {
@@ -538,7 +545,7 @@ class CactbotConfigurator {
   }
 }
 
-UserConfig.getUserConfigLocation('config', async function(e) {
+UserConfig.getUserConfigLocation('config', Options, async function(e) {
   let readConfigFiles = callOverlayHandler({
     call: 'cactbotReadDataFiles',
     source: location.href,

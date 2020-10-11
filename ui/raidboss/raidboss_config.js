@@ -1,5 +1,6 @@
 'use strict';
 
+const PartyTracker = require('../../resources/party.js');
 const Regexes = require('../../resources/regexes.js');
 const UserConfig = require('../../resources/user_config.js');
 

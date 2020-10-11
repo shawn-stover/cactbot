@@ -1,20 +1,15 @@
 'use strict';
 
-const ab = require('../../resources/party.js');
-const ad = require('../../resources/netregexes.js');
-const ae = require('../../resources/conditions.js');
-const af = require('../../resources/player_override.js');
-const ag = require('../../resources/responses.js');
-const ah = require('../../resources/translations.js');
-const aj = require('../../resources/widgetlist.js');
 const UserConfig = require('../../resources/user_config.js');
+
+const { addRemotePlayerSelectUI } = require('../../resources/player_override.js');
 
 const a = require('./common_replacement.js');
 const b = require('./raidboss_config.js');
-const c = require('./timeline.js');
-const d = require('./browser_tts_engine.js');
-const e = require('./autoplay_helper.js');
+const { TimelineController, TimelineLoader, TimelineUI } = require('./timeline.js');
 const { PopupText, PopupTextGenerator } = require('./popup-text.js');
+// TODO: ?
+let { gPopupText } = require('./popup-text.js');
 require('../../resources/common.js');
 require('../../resources/timerbar.js');
 
@@ -108,6 +103,13 @@ UserConfig.getUserConfigLocation('raidboss', Options, function(e) {
   if (!Options.TimelineEnabled)
     container.classList.add('hide-timeline');
 
+  gTimelineController = new TimelineController(Options, new TimelineUI(Options));
+  gPopupText = new PopupText(Options);
+  // Connect the timelines to the popup text, if alerts are desired.
+  if (Options.AlertsEnabled)
+    gTimelineController.SetPopupTextInterface(new PopupTextGenerator(gPopupText));
+  gPopupText.SetTimelineLoader(new TimelineLoader(gTimelineController));
+
   callOverlayHandler({
     call: 'cactbotReadDataFiles',
     source: location.href,
@@ -116,13 +118,6 @@ UserConfig.getUserConfigLocation('raidboss', Options, function(e) {
     gPopupText.OnDataFilesRead(e);
     gPopupText.ReloadTimelines();
   });
-
-  gTimelineController = new TimelineController(Options, new TimelineUI(Options));
-  gPopupText = new PopupText(Options);
-  // Connect the timelines to the popup text, if alerts are desired.
-  if (Options.AlertsEnabled)
-    gTimelineController.SetPopupTextInterface(new PopupTextGenerator(gPopupText));
-  gPopupText.SetTimelineLoader(new TimelineLoader(gTimelineController));
 
   addOverlayListener('onLogEvent', function(e) {
     gTimelineController.OnLogEvent(e);

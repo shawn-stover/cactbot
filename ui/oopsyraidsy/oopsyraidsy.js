@@ -1256,7 +1256,7 @@ class DamageTracker {
   }
 }
 
-UserConfig.getUserConfigLocation('oopsyraidsy', () => {
+UserConfig.getUserConfigLocation('oopsyraidsy', Options, () => {
   let listView;
   let mistakeCollector;
 

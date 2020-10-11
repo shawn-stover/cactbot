@@ -1,8 +1,10 @@
 'use strict';
 
 const path = require('path');
+const { commonReplacement } = require('./common_replacement.js');
 const Regexes = require('../../resources/regexes.js');
 const NetRegexes = require('../../resources/netregexes.js');
+const { LocaleNetRegex, LocaleRegex } = require('../../resources/translations.js');
 
 const timelineInstructions = {
   en: [
@@ -634,7 +636,7 @@ class TimelineUI {
   constructor(options) {
     this.options = options;
     this.init = false;
-    this.lang = Options.TimelineLanguage || Options.ParserLanguage || 'en';
+    this.lang = options.TimelineLanguage || options.ParserLanguage || 'en';
     this.AddDebugInstructions();
   }
 
@@ -645,8 +647,8 @@ class TimelineUI {
 
     this.root = document.getElementById('timeline-container');
     this.root.classList.add('lang-' + this.lang);
-    if (Options.Skin)
-      this.root.classList.add('skin-' + Options.Skin);
+    if (this.options.Skin)
+      this.root.classList.add('skin-' + this.options.Skin);
 
     this.barColor = computeBackgroundColorFrom(this.root, 'timeline-bar-color');
     this.barExpiresSoonColor = computeBackgroundColorFrom(this.root, 'timeline-bar-color.soon');
@@ -950,7 +952,8 @@ class TimelineLoader {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     Timeline: Timeline,
-    TimelineController: TimelineController,
     TimelineUI: TimelineUI,
+    TimelineController: TimelineController,
+    TimelineLoader: TimelineLoader,
   };
 }

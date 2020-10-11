@@ -9,12 +9,9 @@ let Regexes = require('../resources/regexes.js');
 let NetRegexes = require('../resources/netregexes.js');
 let Conditions = require('../resources/conditions.js');
 let ZoneId = require('../resources/zone_id.js');
-let responseModule = require('../resources/responses.js');
-let Responses = responseModule.responses;
+let { Responses } = require('../resources/responses.js');
 let { Timeline } = require('../ui/raidboss/timeline.js');
-let commonReplacementExports = require('../ui/raidboss/common_replacement.js');
-let commonReplacement = commonReplacementExports.commonReplacement;
-let partialCommonReplacementKeys = commonReplacementExports.partialCommonReplacementKeys;
+let { commonReplacement, partialCommonReplacementKeys } = require('../ui/raidboss/common_replacement.js');
 
 // Hackily assume that any file with a txt file of the same name is a trigger/timeline.
 let timelineFile = triggersFile.replace(/\.js$/, '.txt');

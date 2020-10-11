@@ -1,7 +1,17 @@
 'use strict';
 
+// Absolutely necessary for literally everything
+const NetRegexes = require('../../resources/netregexes.js');
+const Conditions = require('../../resources/conditions.js');
+const { Responses } = require('../../resources/responses.js');
+
+
+const AutoplayHelper = require('./autoplay_helper.js');
 const Regexes = require('../../resources/regexes.js');
 const ZoneId = require('../../resources/zone_id.js');
+const PartyTracker = require('../../resources/party.js');
+const { Util } = require('../../resources/common.js');
+const { addPlayerChangedOverrideListener } = require('../../resources/player_override.js');
 
 // There should be (at most) six lines of instructions.
 const raidbossInstructions = {
@@ -99,7 +109,7 @@ class PopupText {
 
     // check to see if we need user interaction to play audio
     // only if audio is enabled in options
-    if (Options.AudioAllowed)
+    if (options.AudioAllowed)
       AutoplayHelper.CheckAndPrompt();
 
     this.partyTracker = new PartyTracker();
@@ -126,7 +136,7 @@ class PopupText {
     addOverlayListener('PartyChanged', (e) => {
       this.partyTracker.onPartyChanged(e);
     });
-    addPlayerChangedOverrideListener(Options.PlayerNameOverride, (e) => {
+    addPlayerChangedOverrideListener(this.options.PlayerNameOverride, (e) => {
       this.OnPlayerChange(e);
     });
     addOverlayListener('ChangeZone', (e) => {
@@ -154,7 +164,7 @@ class PopupText {
   }
 
   OnDataFilesRead(e) {
-    this.triggerSets = Options.Triggers;
+    this.triggerSets = this.options.Triggers;
     for (let filename in e.detail.files) {
       if (!filename.endsWith('.js'))
         continue;
@@ -376,8 +386,8 @@ class PopupText {
       return '???';
     }
 
-    if (name in Options.PlayerNicks)
-      return Options.PlayerNicks[name];
+    if (name in this.options.PlayerNicks)
+      return this.options.PlayerNicks[name];
 
     let idx = name.indexOf(' ');
     return idx < 0 ? name : name.substr(0, idx);
@@ -399,7 +409,7 @@ class PopupText {
       parserLang: this.parserLang,
       displayLang: this.displayLang,
       currentHP: preserveHP,
-      options: Options,
+      options: this.options,
       ShortName: this.ShortNamify,
       StopCombat: () => this.SetInCombat(false),
       ParseLocaleFloat: parseFloat,
@@ -902,6 +912,7 @@ let gPopupText;
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
+    gPopupText: gPopupText,
     PopupText: PopupText,
     PopupTextGenerator: PopupTextGenerator,
   };

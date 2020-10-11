@@ -386,7 +386,7 @@ class Fisher {
   }
 }
 
-UserConfig.getUserConfigLocation('fisher', function() {
+UserConfig.getUserConfigLocation('fisher', Options, function() {
   gFisher = new Fisher(document.getElementById('fisher'));
 
   addOverlayListener('onLogEvent', function(e) {

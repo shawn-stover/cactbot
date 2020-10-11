@@ -1,9 +1,6 @@
 'use strict';
 
-let responseModule = require('../../resources/responses.js');
-let Responses = responseModule.responses;
-let triggerFunctions = responseModule.triggerFunctions;
-let severityMap = responseModule.severityMap;
+let { Responses, triggerFunctions, severityMap } = require('../../resources/responses.js');
 
 let assert = require('chai').assert;
 

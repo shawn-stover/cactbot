@@ -157,7 +157,7 @@ function updatePhase(phase, dpsOrder) {
     maxPhaseDPS.row.addClass('highestdps');
 }
 
-UserConfig.getUserConfigLocation('xephero', function(e) {
+UserConfig.getUserConfigLocation('xephero', Options, function(e) {
   let tracker = new DpsPhaseTracker(Options);
   const onOverlayDataUpdateEvent = (e) => {
     tracker.onOverlayDataUpdate(e.detail);
