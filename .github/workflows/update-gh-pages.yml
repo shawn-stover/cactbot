@@ -37,4 +37,5 @@ jobs:
         run: |
           git checkout -B gh-pages
           git add dist --force
+          git commit -m "gh-pages build"
           git push origin gh-pages --force
