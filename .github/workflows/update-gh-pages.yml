@@ -30,12 +30,14 @@ jobs:
             echo "gh-pages branch not found. Skipping..."
           fi
       - uses: actions/checkout@v2
+      - run: |
+          git fetch --no-tags --depth=1 origin gh-pages
+          git checkout gh-pages
+          git reset --hard main
       - name: Build
         run: |
           npm install
           npm run build
-      - run: |
-          git fetch --no-tags --depth=1 origin gh-pages
       - name: magic
         run: git add dist --force
       - name: git setup
