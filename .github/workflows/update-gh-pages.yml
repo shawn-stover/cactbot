@@ -7,7 +7,8 @@ on:
 jobs:
   check-gh-pages:
     runs-on: ubuntu-latest
-    outputs: ${{ steps.check-gh-pages.outputs.found }}
+    outputs:
+      found: ${{ steps.check-gh-pages.outputs.found }}
     steps:
       - name: Check gh-pages Exists
         id: check-gh-pages
