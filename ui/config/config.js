@@ -556,3 +556,6 @@ UserConfig.getUserConfigLocation('config', Options, async function(e) {
       Options,
       UserConfig.savedConfig);
 });
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = CactbotConfigurator;

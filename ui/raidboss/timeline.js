@@ -957,3 +957,12 @@ if (typeof module !== 'undefined' && module.exports) {
     TimelineLoader: TimelineLoader,
   };
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    Timeline: Timeline,
+    TimelineUI: TimelineUI,
+    TimelineController: TimelineController,
+    TimelineLoader: TimelineLoader,
+  };
+}
