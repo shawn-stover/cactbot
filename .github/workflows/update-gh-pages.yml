@@ -8,15 +8,6 @@ jobs:
   update-gh-pages:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup GitHub Repository Variables
-        id: setup-vars
-        uses: actions/github-script@v2
-        with:
-          # Creates output variables to be used in later steps since there is
-          # no native way to split the strings within the script itself
-          script: |
-            core.setOutput('owner', "${{ github.repository }}".split('/')[0]);
-            core.setOutput('repo', "${{ github.repository }}".split('/')[1]);
       - name: Check gh-pages Exists
         id: check-gh-pages
         shell: bash
@@ -29,54 +20,21 @@ jobs:
             echo "::set-output name=found::false"
             echo "gh-pages branch not found. Skipping..."
           fi
-      - name: Setup GitHub Repository Token
-        id: setup-token
-        uses: actions/github-script@v2
-        if: steps.check-gh-pages.outputs.found == 'true'
-        with:
-          # Sets up token for commit
-          # TODO: FIX THIS!!!
-          script: |
-            if ("${{ github.repository }}" === 'panicstevenson/cactbot') {
-              core.setOutput('token', "${{ secrets.USER_TOKEN }}");
-            } else {
-              core.setOutput('token', "${{ secrets.GITHUB_TOKEN }}");
-            }
       - uses: actions/checkout@v2
-        with:
-          token: "${{ steps.setup-token.outputs.token }}"
-      - run: |
-          git checkout -B gh-pages
+        if: steps.check-gh-pages.outputs.found == 'true'
       - name: Build
+        if: steps.check-gh-pages.outputs.found == 'true'
         run: |
           npm install
           npm run build
-      - name: magic
-        run: git add dist --force
       - name: git setup
+        if: steps.check-gh-pages.outputs.found == 'true'
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-      - name: magic 2
-        run: git commit --amend
-      - name: Update gh-pages
+      - name: git commit and push
         if: steps.check-gh-pages.outputs.found == 'true'
         run: |
+          git checkout -B gh-pages
+          git add dist --force
           git push origin gh-pages --force
-  # build-gh-pages:
-  #   runs-on: ubuntu-latest
-  #   needs: update-gh-pages
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         token: ${{ secrets.USER_TOKEN }} # TODO: Make sure this gets changed!!!!!!
-  #         ref: gh-pages
-  #       run: npm run build
-  #     - name: git setup
-  #       run: |
-  #         git config user.name github-actions
-  #         git config user.email github-actions@github.com
-  #     - name: magic 2
-  #       run: git commit -m "gh-pages build"
-  #     - name: magic 3
-  #       run: git push
