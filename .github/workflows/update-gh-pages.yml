@@ -7,6 +7,7 @@ on:
 jobs:
   check-gh-pages:
     runs-on: ubuntu-latest
+    outputs: ${{ steps.check-gh-pages.outputs.found }}
     steps:
       - name: Check gh-pages Exists
         id: check-gh-pages
@@ -22,7 +23,8 @@ jobs:
           fi
   update-gh-pages:
     runs-on: ubuntu-latest
-    if: jobs.check-gh-pages.steps.check-gh-pages.outputs.found == 'true'
+    needs: check-gh-pages
+    if: needs.check-gh-pages.outputs.found == 'true'
     steps:
       - uses: actions/checkout@v2
       - name: Build
