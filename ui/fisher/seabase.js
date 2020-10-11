@@ -4,12 +4,12 @@ const gFisherData = require('./static-data.js');
 
 class SeaBase {
   constructor(options) {
-    this.options = options;
     this._dbName = 'seabase';
     this._dbVersion = 1;
     this._storeName = 'catches';
     this.db = null;
-    this.parserLang = options.ParserLanguage;
+    this.options = options;
+    this.parserLang = this.options.ParserLanguage;
   }
 
   findKey(obj, val) {

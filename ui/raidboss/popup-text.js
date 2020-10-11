@@ -4,7 +4,7 @@
 const NetRegexes = require('../../resources/netregexes.js');
 const Conditions = require('../../resources/conditions.js');
 const { Responses } = require('../../resources/responses.js');
-
+const { BrowserTTSEngine } = require('./browser_tts_engine.js');
 
 const AutoplayHelper = require('./autoplay_helper.js');
 const Regexes = require('../../resources/regexes.js');
@@ -109,7 +109,7 @@ class PopupText {
 
     // check to see if we need user interaction to play audio
     // only if audio is enabled in options
-    if (options.AudioAllowed)
+    if (this.options.AudioAllowed)
       AutoplayHelper.CheckAndPrompt();
 
     this.partyTracker = new PartyTracker();

@@ -636,7 +636,7 @@ class TimelineUI {
   constructor(options) {
     this.options = options;
     this.init = false;
-    this.lang = options.TimelineLanguage || options.ParserLanguage || 'en';
+    this.lang = this.options.TimelineLanguage || this.options.ParserLanguage || 'en';
     this.AddDebugInstructions();
   }
 
