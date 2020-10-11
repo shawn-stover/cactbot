@@ -45,7 +45,7 @@ jobs:
       - name: Update gh-pages
         if: steps.check-gh-pages.outputs.found == 'true'
         run: |
-          git push gh-pages --force
+          git push origin gh-pages --force
   # build-gh-pages:
   #   runs-on: ubuntu-latest
   #   needs: update-gh-pages
