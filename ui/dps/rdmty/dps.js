@@ -1,8 +1,9 @@
 'use strict';
 
-require('../dps_common.js');
-require('../../../resources/common.js');
+const { InitDpsModule, Options } = require('../dps_common.js');
 const UserConfig = require('../../../resources/user_config.js');
+
+require('../../../resources/common.js');
 
 // fiddle: http://jsfiddle.net/v1ddnsvh/8/
 /* global window */
@@ -517,6 +518,6 @@ function hideOverlay() {
     document.getElementById('container').style.display = 'none';
 }
 
-UserConfig.getUserConfigLocation('rdmty', (e) => {
+UserConfig.getUserConfigLocation('rdmty', Options, (e) => {
     InitDpsModule(onOverlayDataUpdate, hideOverlay);
 });
