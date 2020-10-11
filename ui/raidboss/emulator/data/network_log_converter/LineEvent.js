@@ -1,5 +1,7 @@
 'use strict';
 
+const EmulatorCommon = require('../../EmulatorCommon.js');
+
 /**
  * Generic class to track an FFXIV log line
  */

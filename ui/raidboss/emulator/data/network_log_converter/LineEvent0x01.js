@@ -1,6 +1,7 @@
 'use strict';
 
 const LineEvent = require('./LineEvent.js');
+const EmulatorCommon = require('../../EmulatorCommon.js');
 
 // Zone change event
 class LineEvent0x01 extends LineEvent {
@@ -20,3 +21,10 @@ class LineEvent0x01 extends LineEvent {
 }
 
 class LineEvent01 extends LineEvent0x01 {}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    LineEvent0x01: LineEvent0x01,
+    LineEvent01: LineEvent01,
+  };
+}

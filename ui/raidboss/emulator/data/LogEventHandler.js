@@ -1,6 +1,8 @@
 'use strict';
 
+const EmulatorCommon = require('../EmulatorCommon.js');
 const EventBus = require('../EventBus.js');
+const { LocaleNetRegex } = require('../../../../resources/translations.js');
 
 class LogEventHandler extends EventBus {
   static doesLineMatch(line, regexes) {

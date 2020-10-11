@@ -1,6 +1,9 @@
 'use strict';
 
 const LineEvent = require('./LineEvent.js');
+const { LineEvent0x1A } = require('./LineEvent0x1A.js');
+const EmulatorCommon = require('../../EmulatorCommon.js');
+
 
 // Lose status effect event
 // Extend the gain status event to reduce duplicate code since they're
@@ -30,3 +33,10 @@ class LineEvent0x1E extends LineEvent0x1A {
 }
 
 class LineEvent30 extends LineEvent0x1E {}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    LineEvent0x1E: LineEvent0x1E,
+    LineEvent30: LineEvent30,
+  };
+}

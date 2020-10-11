@@ -3,11 +3,11 @@
 const UserConfig = require('../../resources/user_config.js');
 
 // Used by downstream eval
-const ZoneId = require('../../resources/zone_id.js');
+const Conditions = require('../../resources/conditions.js');
 const NetRegexes = require('../../resources/netregexes.js');
 const Regexes = require('../../resources/regexes.js');
-const Conditions = require('../../resources/conditions.js');
 const { Responses } = require('../../resources/responses.js');
+const ZoneId = require('../../resources/zone_id.js');
 
 require('./general_config.js');
 require('../eureka/eureka_config.js');

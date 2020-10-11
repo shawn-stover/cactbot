@@ -1,5 +1,6 @@
 'use strict';
 
+const EmulatorCommon = require('../EmulatorCommon.js');
 const EventBus = require('../EventBus.js');
 
 class EncounterTab extends EventBus {

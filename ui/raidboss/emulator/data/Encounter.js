@@ -1,5 +1,9 @@
 'use strict';
 
+const CombatantTracker = require('./CombatantTracker.js');
+const LogEventHandler = require('./LogEventHandler.js');
+const PetNamesByLang = require('../../../../resources/pet_names.js');
+
 class Encounter {
   constructor(encounterDay, encounterZoneId, encounterZoneName, logLines) {
     this.id = null;
@@ -87,3 +91,6 @@ class Encounter {
     this.startStatus = [...this.startStatus].sort().join(', ');
   }
 }
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = Encounter;

@@ -1,6 +1,9 @@
 'use strict';
 
+const EmulatorCommon = require('../EmulatorCommon.js');
 const EventBus = require('../EventBus.js');
+const PersistorEncounter = require('./PersistorEncounter.js');
+const Encounter = require('./Encounter.js');
 
 class Persistor extends EventBus {
   constructor() {

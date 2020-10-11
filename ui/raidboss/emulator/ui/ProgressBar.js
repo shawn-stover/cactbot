@@ -1,6 +1,7 @@
 'use strict';
 
 const Tooltip = require('./Tooltip.js');
+const EmulatorCommon = require('../EmulatorCommon.js');
 
 class ProgressBar {
   constructor(emulator) {

@@ -9,6 +9,7 @@ const UserConfig = require('../../resources/user_config.js');
 const LogEventHandler = require('./emulator/data/LogEventHandler.js');
 const EmulatedPartyInfo = require('./emulator/ui/EmulatedPartyInfo.js');
 const EncounterTab = require('./emulator/ui/EncounterTab.js');
+const Encounter = require('./emulator/data/Encounter.js');
 const RaidEmulatorOverlayApiHook = require('./emulator/overrides/RaidEmulatorOverlayApiHook.js');
 const EmulatedMap = require('./emulator/ui/EmulatedMap.js');
 const NetworkLogConverter = require('./emulator/data/NetworkLogConverter.js');
@@ -23,6 +24,20 @@ const { TimelineLoader } = require('./timeline.js');
 
 require('../../resources/common.js');
 require('./raidboss_config.js');
+
+// TODO: ????????????????????????????????????????????????????????!!!!!!!!!!!!!!!!!!!!!!
+let Regexes = require('../../resources/regexes.js');
+let NetRegexes = require('../../resources/netregexes.js');
+let { Responses } = require('../../resources/responses.js');
+let Conditions = require('../../resources/conditions.js');
+require('../../resources/timerbar.js');
+require('../../resources/widgetlist.js');
+require('../../resources/zone_id.js');
+require('../../resources/pet_names.js');
+require('../../resources/translations.js');
+require('./autoplay_helper.js');
+require('./common_replacement.js');
+require('./browser_tts_engine.js');
 
 // @TODO: Some way to not have this be a global?
 
@@ -64,7 +79,7 @@ let Options = {
   let timelineUI;
 
   document.addEventListener('DOMContentLoaded', () => {
-    emulator = new RaidEmulator();
+    emulator = new RaidEmulator(Options);
     progressBar = new ProgressBar(emulator);
     persistor = new Persistor();
     logEventHandler = new LogEventHandler();

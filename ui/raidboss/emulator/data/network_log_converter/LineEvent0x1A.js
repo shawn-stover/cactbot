@@ -1,6 +1,7 @@
 'use strict';
 
 const LineEvent = require('./LineEvent.js');
+const EmulatorCommon = require('../../EmulatorCommon.js');
 
 // Gain status effect event
 class LineEvent0x1A extends LineEvent {
@@ -67,3 +68,10 @@ LineEvent0x1A.showStackCountFor = [
   '4d7', // Embolden
   '511', // Embolden
 ];
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    LineEvent0x1A: LineEvent0x1A,
+    LineEvent26: LineEvent26,
+  };
+}

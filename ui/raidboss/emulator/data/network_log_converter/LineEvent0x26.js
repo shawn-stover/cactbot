@@ -1,6 +1,8 @@
 'use strict';
 
 const LineEvent = require('./LineEvent.js');
+const EmulatorCommon = require('../../EmulatorCommon.js');
+const { Util } = require('../../../../../resources/common.js');
 
 // Network status effect event
 class LineEvent0x26 extends LineEvent {
@@ -32,3 +34,10 @@ class LineEvent0x26 extends LineEvent {
 }
 
 class LineEvent38 extends LineEvent0x26 {}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    LineEvent0x26: LineEvent0x26,
+    LineEvent38: LineEvent38,
+  };
+}

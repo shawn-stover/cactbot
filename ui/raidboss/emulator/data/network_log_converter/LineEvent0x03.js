@@ -1,6 +1,8 @@
 'use strict';
 
 const LineEvent = require('./LineEvent.js');
+const EmulatorCommon = require('../../EmulatorCommon.js');
+const { Util } = require('../../../../../resources/common.js');
 
 // Added combatant event
 class LineEvent0x03 extends LineEvent {
@@ -62,3 +64,10 @@ class LineEvent0x03 extends LineEvent {
 }
 
 class LineEvent03 extends LineEvent0x03 {}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    LineEvent0x03: LineEvent0x03,
+    LineEvent03: LineEvent03,
+  };
+}

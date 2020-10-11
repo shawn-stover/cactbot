@@ -1,5 +1,12 @@
 'use strict';
 
+// Used by downstream eval
+const Conditions = require('./conditions.js');
+const NetRegexes = require('./netregexes.js');
+const Regexes = require('./regexes.js');
+const { Responses } = require('./responses.js');
+const ZoneId = require('./zone_id.js');
+
 let UserConfig = {
   optionTemplates: {},
   savedConfig: null,
@@ -89,6 +96,7 @@ let UserConfig = {
         if (jsFile in localFiles) {
           try {
             printUserFile('local user file: ' + basePath + '\\' + jsFile);
+            let Options = options;
             eval(localFiles[jsFile]);
           } catch (e) {
             // Be very visible for users.

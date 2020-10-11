@@ -1,10 +1,19 @@
 'use strict';
 
+const EmulatorCommon = require('../EmulatorCommon.js');
 const EventBus = require('../EventBus.js');
+const { gPopupText, PopupTextGenerator } = require('../../popup-text.js');
+const RaidEmulatorTimelineController = require('../overrides/RaidEmulatorTimelineController.js');
+const RaidEmulatorTimelineUI = require('../overrides/RaidEmulatorTimelineUI.js');
+const PopupTextAnalysis = require('../data/PopupTextAnalysis.js');
+const { TimelineLoader } = require('../../timeline.js');
+const { Util } = require('../../../../resources/common.js');
+
 
 class AnalyzedEncounter extends EventBus {
-  constructor(encounter, emulator) {
+  constructor(options, encounter, emulator) {
     super();
+    this.options = options;
     this.popupText = null;
     this.perspectives = {};
     this.encounter = encounter;
@@ -43,8 +52,8 @@ class AnalyzedEncounter extends EventBus {
     }
 
     const popupText = new PopupTextAnalysis(this.popupText.options);
-    const gTimelineUI = new RaidEmulatorTimelineUI(Options);
-    const gTimelineController = new RaidEmulatorTimelineController(Options, gTimelineUI);
+    const gTimelineUI = new RaidEmulatorTimelineUI(this.options);
+    const gTimelineController = new RaidEmulatorTimelineController(this.options, gTimelineUI);
 
     gTimelineController.SetPopupTextInterface(new PopupTextGenerator(gPopupText));
     gTimelineController.SetDataFiles(this.emulator.dataFilesEvent.detail.files);
@@ -110,3 +119,6 @@ class AnalyzedEncounter extends EventBus {
     }
   }
 }
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = AnalyzedEncounter;

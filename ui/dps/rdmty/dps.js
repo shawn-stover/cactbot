@@ -2,8 +2,7 @@
 
 require('../dps_common.js');
 require('../../../resources/common.js');
-require('../../../resources/lib/lodash.min.js');
-require('../../../resources/lib/react.min.js');
+const UserConfig = require('../../../resources/user_config.js');
 
 // fiddle: http://jsfiddle.net/v1ddnsvh/8/
 /* global window */
@@ -498,3 +497,26 @@ DamageMeter.defaultProps = {
     parseData: {},
     noJobColors: false
 };
+
+function onOverlayDataUpdate(e) {
+    let start = new Date().getTime();
+    let details = e.detail;
+    let container = document.getElementById('container');
+    container.style.display = 'block';
+
+    React.render(
+        React.createElement(DamageMeter, {
+            parseData: e.detail
+        }),
+        container
+    );
+    //console.log('rendered in ' + (+new Date() - start) + 'ms');
+}
+
+function hideOverlay() {
+    document.getElementById('container').style.display = 'none';
+}
+
+UserConfig.getUserConfigLocation('rdmty', (e) => {
+    InitDpsModule(onOverlayDataUpdate, hideOverlay);
+});

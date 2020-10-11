@@ -1,6 +1,7 @@
 'use strict';
 
 const LogRepository = require('./network_log_converter/LogRepository.js');
+const ParseLine = require('./network_log_converter/ParseLine.js');
 
 class NetworkLogConverter {
   constructor(Options) {

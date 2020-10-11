@@ -1,5 +1,10 @@
 'use strict';
 
+const Combatant = require('./Combatant.js');
+const CombatantJobSearch = require('./CombatantJobSearch.js');
+const CombatantState = require('./CombatantState.js');
+const PetNamesByLang = require('../../../../resources/pet_names.js');
+
 class CombatantTracker {
   constructor(logLines, language) {
     this.language = language;
@@ -223,3 +228,6 @@ class CombatantTracker {
     return 'Unknown';
   }
 }
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = CombatantTracker;

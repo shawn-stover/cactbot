@@ -1,5 +1,6 @@
 'use strict';
 
+const EmulatorCommon = require('../EmulatorCommon.js');
 const StubbedPopupText = require('../overrides/StubbedPopupText.js');
 
 class PopupTextAnalysis extends StubbedPopupText {
@@ -225,3 +226,6 @@ class PopupTextAnalysis extends StubbedPopupText {
     // No-op
   }
 }
+
+if (typeof module !== 'undefined' && module.exports)
+  module.exports = PopupTextAnalysis;

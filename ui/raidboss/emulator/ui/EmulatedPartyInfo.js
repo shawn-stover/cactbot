@@ -1,7 +1,9 @@
 'use strict';
 
+const EmulatorCommon = require('../EmulatorCommon.js');
 const EventBus = require('../EventBus.js');
 const Tooltip = require('./Tooltip.js');
+const { Util } = require('../../../../resources/common.js');
 
 class EmulatedPartyInfo extends EventBus {
   constructor(emulator) {
