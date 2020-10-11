@@ -46,8 +46,8 @@ jobs:
     needs: update-gh-pages
     steps:
       - uses: actions/checkout@v2
-        token: ${{ secrets.USER_TOKEN }} # TODO: Make sure this gets changed!!!!!!
         with:
+          token: ${{ secrets.USER_TOKEN }} # TODO: Make sure this gets changed!!!!!!
           ref: gh-pages
       - run: npm install
       - name: Deploying the static website to gh-pages
