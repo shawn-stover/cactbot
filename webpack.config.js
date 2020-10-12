@@ -30,6 +30,14 @@ module.exports = {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
+      {
+        test: /manifest.txt$/,
+        use: [
+          {
+            loader: './webpack/loaders/manifest-loader.js',
+          },
+        ],
+      },
     ],
   },
 };
