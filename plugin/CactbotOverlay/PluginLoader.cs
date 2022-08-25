@@ -5,17 +5,29 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System;
+using Cactbot.loc;
 
 namespace Cactbot
 {
     public class PluginLoader : IActPluginV1, IOverlayAddonV2
     {
         private static AssemblyResolver asmResolver;
+
+        public string Name
+        {
+        get { return "Cactbot"; }
+        }
+
+        public string Description
+        {
+        get { return "A hodgepodge of bindings"; }
+        }
+
         private static Version kMinOverlayPluginVersion = new Version(0, 13, 0);
 
         public void DeInitPlugin()
         {
-            
+
         }
 
         public void InitPlugin(TabPage pluginScreenSpace, Label pluginStatusText)
@@ -24,21 +36,28 @@ namespace Cactbot
                 asmResolver = new AssemblyResolver(new List<string>{GetPluginDirectory()});
             }
 
-            pluginStatusText.Text = "Ready.";
+            pluginStatusText.Text = Strings.Ready;
 
             // We don't need a tab here.
             ((TabControl)pluginScreenSpace.Parent).TabPages.Remove(pluginScreenSpace);
 
             if (GetOverlayPluginVersion() < kMinOverlayPluginVersion) {
-                throw new Exception($"Cactbot requires OverlayPlugin {kMinOverlayPluginVersion.ToString()}, " +
-                    $"found {GetOverlayPluginVersion().ToString()}");
+                throw new Exception(String.Format(
+                    Strings.CactbotRequireOverlayPluginError,
+                    kMinOverlayPluginVersion.ToString(),
+                    GetOverlayPluginVersion().ToString()
+                ));
             }
         }
 
-        public void Init()
-        {
-            Registry.RegisterEventSource<CactbotEventSource>();
-        }
+    public void Init()
+    {
+        var container = Registry.GetContainer();
+        var registry = container.Resolve<Registry>();
+
+        // Register EventSource
+        registry.StartEventSource(new CactbotEventSource(container));
+    }
 
         private string GetPluginDirectory()
         {
@@ -49,7 +68,7 @@ namespace Cactbot
             }
             else
             {
-                throw new Exception("Could not find ourselves in the plugin list!");
+                throw new Exception(Strings.CouldNotFoundItSelf);
             }
         }
 

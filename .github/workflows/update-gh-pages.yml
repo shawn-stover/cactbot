@@ -5,18 +5,11 @@ on:
     branches: [ main ]
 
 jobs:
-  update-gh-pages:
+  check-gh-pages:
     runs-on: ubuntu-latest
+    outputs:
+      found: ${{ steps.check-gh-pages.outputs.found }}
     steps:
-      - name: Setup GitHub Repository Variables
-        id: setup-vars
-        uses: actions/github-script@v2
-        with:
-          # Creates output variables to be used in later steps since there is
-          # no native way to split the strings within the script itself
-          script: |
-            core.setOutput('owner', "${{ github.repository }}".split('/')[0])
-            core.setOutput('repo', "${{ github.repository }}".split('/')[1])
       - name: Check gh-pages Exists
         id: check-gh-pages
         shell: bash
@@ -29,15 +22,35 @@ jobs:
             echo "::set-output name=found::false"
             echo "gh-pages branch not found. Skipping..."
           fi
-      - name: Update gh-pages
-        uses: actions/github-script@v2
-        if: steps.check-gh-pages.outputs.found == 'true'
+  update-gh-pages:
+    runs-on: ubuntu-latest
+    needs: check-gh-pages
+    if: needs.check-gh-pages.outputs.found == 'true'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
         with:
-          script: |
-            github.git.updateRef({
-              owner: "${{ steps.setup-vars.outputs.owner }}",
-              repo: "${{ steps.setup-vars.outputs.repo }}",
-              ref: "heads/gh-pages",
-              sha: context.sha,
-              force: true
-            })
+          node-version: '16'
+      - name: Cache Dependencies
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ./node_modules
+          key: modules-${{ hashFiles('package-lock.json') }}
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          npm ci --ignore-scripts
+      - name: Build
+        run: |
+          npm run coverage-report
+          npm run build-gh-pages
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          user_name: "github-actions"
+          user_email: "github-actions@github.com"
+          commit_message: "gh-pages build: ${{ github.event.head_commit.message }}"
+          enable_jekyll: true # Don't commit the .nojekyll file

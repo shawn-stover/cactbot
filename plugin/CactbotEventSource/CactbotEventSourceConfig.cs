@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using CactbotEventSource.loc;
 
 namespace Cactbot {
   [Serializable]
   public class CactbotEventSourceConfig {
-    public event EventHandler WatchFileChangesChanged;
     public CactbotEventSourceConfig() {
     }
 
-    public static CactbotEventSourceConfig LoadConfig(IPluginConfig pluginConfig, RainbowMage.OverlayPlugin.ILogger logger) {
+    public static CactbotEventSourceConfig LoadConfig(IPluginConfig pluginConfig, ILogger logger) {
       var result = new CactbotEventSourceConfig();
 
       if (pluginConfig.EventSourceConfigs.ContainsKey("CactbotESConfig")) {
@@ -22,7 +22,7 @@ namespace Cactbot {
           try {
             result.OverlayData = value.ToObject<Dictionary<string, JToken>>();
           } catch (Exception e) {
-            logger.Log(LogLevel.Error, "Failed to load OverlayData setting: {0}", e.ToString());
+            logger.Log(LogLevel.Error, Strings.LoadOverlayDataSettingsFailed, e.ToString());
           }
         }
 
@@ -30,7 +30,7 @@ namespace Cactbot {
           try {
             result.LastUpdateCheck = value.ToObject<DateTime>();
           } catch (Exception e) {
-            logger.Log(LogLevel.Error, "Failed to load LastUpdateCheck setting: {0}", e.ToString());
+            logger.Log(LogLevel.Error, Strings.LoadLastUpdateCheckSettingsFailed, e.ToString());
           }
         }
       }
@@ -42,15 +42,8 @@ namespace Cactbot {
       pluginConfig.EventSourceConfigs["CactbotESConfig"] = JObject.FromObject(this);
     }
 
-    public void OnUpdateConfig() {
-      var currentValue = WatchFileChanges;
-      if (watchFileChanges != currentValue)
-        WatchFileChangesChanged?.Invoke(this, new EventArgs());
-        watchFileChanges = currentValue;
-    }
-
     public Dictionary<string, JToken> OverlayData = null;
-    
+
     public DateTime LastUpdateCheck;
 
     [JsonIgnore]
@@ -67,7 +60,7 @@ namespace Cactbot {
         return dir.ToString();
       }
     }
-    
+
     [JsonIgnore]
     public string UserConfigFile {
       get {
@@ -92,38 +85,6 @@ namespace Cactbot {
           options["general"] = general;
         }
         general["CactbotUserDirectory"] = value;
-      }
-    }
-
-    [JsonIgnore]
-    private bool watchFileChanges = false;
-    [JsonIgnore]
-    public bool WatchFileChanges {
-      get {
-        if (!OverlayData.TryGetValue("options", out JToken options))
-          return false;
-        var general = options["general"];
-        if (general == null)
-          return false;
-
-        var developer = general["ShowDeveloperOptions"];
-        if (developer == null)
-          return false;
-        try {
-          if (!developer.ToObject<bool>())
-            return false;
-        } catch {
-          return false;
-        }
-
-        var reload = general["ReloadOnFileChange"];
-        if (reload == null)
-          return false;
-        try {
-          return reload.ToObject<bool>();
-        } catch {
-          return false;
-        }
       }
     }
   }

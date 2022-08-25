@@ -11,19 +11,19 @@ import encounter_tools as e_tools
 
 """FFLogs returns battle events in a list of dicts that looks something like this:
     {
-      "timestamp": 4816719,
-      "type": "cast",
-      "sourceID": 113,
-      "sourceIsFriendly": false,
-      "targetID": 95,
-      "targetIsFriendly": true,
-      "ability": {
-        "name": "attack",
-        "guid": 870,
-        "type": 128,
-        "abilityIcon": "000000-000405.png"
-      },
-      "pin": "0"
+        "timestamp": 4816719,
+        "type": "cast",
+        "sourceID": 113,
+        "sourceIsFriendly": false,
+        "targetID": 95,
+        "targetIsFriendly": true,
+        "ability": {
+            "name": "attack",
+            "guid": 870,
+            "type": 128,
+            "abilityIcon": "000000-000405.png"
+        },
+        "pin": "0"
     },
 We map from the type property here to ACT network log line numbers.
 Technically there are both 21 and 22 log lines,
@@ -32,32 +32,36 @@ but for the purposes of this script it doesn't matter which one we map to.
 Sometimes there's an environmental actor that doesn't have the same layout.
 These are assigned a GUID of 9020. They will have a "source" property:
 {
-  "timestamp": 5308320,
-  "type": "cast",
-  "source": {
-    "name": "Leviathan",
-    "id": 31,
-    "guid": 9020,
-    "type": "NPC",
-    "icon": "NPC"
-  },
-  "sourceInstance": 1,
-  "sourceIsFriendly": false,
-  "targetID": 1,
-  "targetIsFriendly": true,
-  "ability": {
-    "name": "Rip Current",
-    "guid": 16353,
-    "type": 1024,
-    "abilityIcon": "000000-000405.png"
-  },
-  "pin": "0"
+    "timestamp": 5308320,
+    "type": "cast",
+    "source": {
+        "name": "Leviathan",
+        "id": 31,
+        "guid": 9020,
+        "type": "NPC",
+        "icon": "NPC"
+    },
+    "sourceInstance": 1,
+    "sourceIsFriendly": false,
+    "targetID": 1,
+    "targetIsFriendly": true,
+    "ability": {
+        "name": "Rip Current",
+        "guid": 16353,
+        "type": 1024,
+        "abilityIcon": "000000-000405.png"
+    },
+    "pin": "0"
 }
 """
 
 log_event_types = {
     "cast": "21",
 }
+
+# Write to stdout with an explicit encoding of UTF-8
+# See: https://stackoverflow.com/a/3597849
+utf8stdout = open(1, "w", encoding="utf-8", closefd=False)
 
 
 def make_entry(overrides):
@@ -127,6 +131,9 @@ def parse_report(args):
             event["sourceID"] = event["source"]["id"]
             enemies[event["sourceID"]] = event["source"]["name"]
 
+        if event["ability"]["name"].startswith(("Unknown_", "unknown_")):
+            event["ability"]["name"] = "--sync--"
+
         entry = make_entry(
             {
                 "time": datetime.fromtimestamp((report_start_time + event["timestamp"]) / 1000),
@@ -154,10 +161,7 @@ def parse_file(args):
             encounter_sets = e_tools.find_fights_in_file(file)
             # If all we want to do is list encounters, stop here and give to the user.
             if args.search_fights < 0:
-                return [f'{i + 1}. {" ".join(e_info)}' for i, e_info in enumerate(encounter_sets)]
-            elif args.search_fights > len(encounter_sets):
-                raise Exception("Selected fight index not in selected ACT log.")
-
+                return e_tools.list_fights_in_file(args, encounter_sets)
         start_time, end_time = e_tools.choose_fight_times(args, encounter_sets)
         # Scan the file until the start timestamp
         for line in file:
@@ -173,17 +177,34 @@ def parse_file(args):
                 started = True
                 last_ability_time = e_tools.parse_event_time(line)
 
+            # We cull non-useful lines before potentially more expensive operations.
+            if not line[0:2] in ["00", "21", "22", "34"]:
+                continue
+
+            line_fields = line.split("|")
+
+            # If it's a zone seal, we want to make a special entry.
+            if e_tools.is_zone_seal(line_fields):
+                entry = make_entry(
+                    {
+                        "line_type": "zone_seal",
+                        "time": e_tools.parse_event_time(line),
+                        "zone_message": line_fields[4].split(" will be sealed off")[0],
+                    }
+                )
+                entries.append(entry)
+                continue
+
             # We're looking for enemy casts or enemies becoming targetable/untargetable.
             # These lines will start with 21, 22, or 34, and have an NPC ID (400#####)
-            # If this isn't one, skip the line
+            # If none of these apply, skip the line
 
-            if not (line[0:2] in ["21", "22", "34"]) or not line[37:40] == "400":
+            if not line[0:2] in ["21", "22", "34"] or not line[37:40] == "400":
                 continue
-            line_fields = line.split("|")
+
             # We aren't including targetable lines unless the user explicitly says to.
             if line[0:2] == "34" and not line_fields[3] in args.include_targetable:
                 continue
-
             # At this point, we have a combat line for the timeline.
             entry = make_entry(
                 {
@@ -197,7 +218,7 @@ def parse_file(args):
                 entry["ability_name"] = line_fields[5]
 
             # Unknown abilities should be hidden sync lines by default.
-            if line_fields[5].startswith("Unknown_"):
+            if line_fields[5].startswith(("Unknown_", "unknown_")):
                 entry["ability_name"] = "--sync--"
             else:
                 entry["targetable"] = (
@@ -223,6 +244,10 @@ def main(args):
         "Garuda-Egi",
         "Titan-Egi",
         "Ifrit-Egi",
+        "Carbuncle",
+        "Ruby Ifrit",
+        "Emerald Garuda",
+        "Topaz Titan",
         "Emerald Carbuncle",
         "Topaz Carbuncle",
         "Ruby Carbuncle",
@@ -243,9 +268,19 @@ def main(args):
         "Minfilia",
         "Thancred",
         "Urianger",
+        "Estinien",
+        "G'raha Tia",
+        "Alphinaud's Avatar",
+        "Alisaie's Avatar",
+        "Thancred's Avatar",
+        "Urianger's Avatar",
+        "Y'shtola's Avatar",
+        "Estinien's Avatar",
+        "G'raha Tia's Avatar",
         "",
-        "2P",
         "Crystal Exarch",
+        "Mikoto",
+        "Liturgic Bell",
     ]
 
     # Format the phase timings
@@ -266,7 +301,15 @@ def main(args):
     last_entry = make_entry({})
 
     output = []
-    output.append('0 "Start" sync /Engage!/ window 0,1')
+    if entries[0]["line_type"] and entries[0]["line_type"] == "zone_seal":
+        output.append(
+            '0.0 "--sync--" sync / 00:0839::{} will be sealed off/ window 0,1'.format(
+                entries[0]["zone_message"].title()
+            )
+        )
+        entries.pop(0)
+    else:
+        output.append('0.0 "--sync--" sync /Engage!/ window 0,1')
 
     for entry in entries:
 
@@ -274,7 +317,7 @@ def main(args):
         if entry["line_type"] in ["21", "22"]:
             # First up, check if it's an ignored entry
             # Ignore autos, probably need a better rule than this
-            if entry["ability_name"] == "Attack":
+            if entry["ability_name"].lower() == "Attack".lower():
                 continue
 
         # Ignore abilities by NPC allies
@@ -345,11 +388,11 @@ def main(args):
         if entry["line_type"] == "34":
             output_entry = '{position:.1f} "{targetable}"'.format(**entry)
         else:
-            output_entry = '{position:.1f} "{ability_name}" sync /:{combatant}:{ability_id}:/'.format(
+            output_entry = '{position:.1f} "{ability_name}" sync / 1[56]:[^:]*:{combatant}:{ability_id}:/'.format(
                 **entry
             )
 
-        output.append(output_entry.encode("ascii", "ignore").decode("utf8", "ignore"))
+        output.append(output_entry)
 
         # Save the entry til the next line for filtering
         last_entry = entry
@@ -385,7 +428,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-k",
         "--key",
-        help="The FFLogs API key to use, from https://www.fflogs.com/accounts/changeuser",
+        help="The FFLogs API key to use, from https://www.fflogs.com/profile",
     )
     parser.add_argument(
         "-rf",
@@ -466,17 +509,17 @@ if __name__ == "__main__":
 
     # Check dependent args
     if args.search_fights and not args.file:
-        raise parser.error("Automatic encounter listing requires an input file")
+        parser.error("Automatic encounter listing requires an input file")
     if args.file and not ((args.start and args.end) or args.search_fights):
-        raise parser.error("Log file input requires start and end timestamps")
+        parser.error("Log file input requires start and end timestamps")
     if args.report and not args.key:
-        raise parser.error(
-            "FFlogs parsing requires an API key. Visit https://www.fflogs.com/accounts/changeuser and use the Public key"
+        parser.error(
+            "FFlogs parsing requires an API key. Visit https://www.fflogs.com/profile and use the V1 Client Key"
         )
 
     # Actually call the script
     if not args.report or len(args.report.split(",")) == 1:
-        print("\n".join(main(args)))
+        print("\n".join(main(args)), file=utf8stdout)
     else:
         timelines = []
         tmp_args = args
@@ -484,4 +527,4 @@ if __name__ == "__main__":
             tmp_args.report = report
             timelines.append(main(tmp_args))
         timeline_aggregator = timeline_aggregator.TimelineAggregator(timelines)
-        print("\n".join(timeline_aggregator.aggregate(args.aggregate_threshold)))
+        print("\n".join(timeline_aggregator.aggregate(args.aggregate_threshold)), file=utf8stdout)

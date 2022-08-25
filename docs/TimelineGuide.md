@@ -199,9 +199,9 @@ This is done by adding a `timelineTriggers` section to the triggers file.
 
 Examples:
 
-* [Orbonne Monastery](https://github.com/quisquous/cactbot/blob/main/ui/raidboss/data/04-sb/alliance/orbonne_monastery.js)
-* [T9](https://github.com/quisquous/cactbot/blob/main/ui/raidboss/data/02-arr/raid/t9.js)
-* [O12 normal](https://github.com/quisquous/cactbot/blob/main/ui/raidboss/data/04-sb/raid/o12n.js)
+* [Orbonne Monastery](https://github.com/quisquous/cactbot/blob/main/ui/raidboss/data/04-sb/alliance/orbonne_monastery.ts)
+* [T9](https://github.com/quisquous/cactbot/blob/main/ui/raidboss/data/02-arr/raid/t9.ts)
+* [O12 normal](https://github.com/quisquous/cactbot/blob/main/ui/raidboss/data/04-sb/raid/o12n.ts)
 
 These triggers have the [same syntax](https://github.com/quisquous/cactbot/blob/main/ui/raidboss/data/README.txt) as normal triggers.
 They still allow you to use functions if you want to return something.
@@ -242,7 +242,7 @@ This has two purposes.
 The first purpose is for tools, to autogenerate regular expression translations for triggers.
 
 The second purpose is for timelines at runtime.
-cactbot will use the `replaceSync` section to auto-replace anything inside a `sync /text`/ on a timeline line,
+cactbot will use the `replaceSync` section to auto-replace anything inside a `sync /text/` on a timeline line,
 and the `replaceText` section to auto-replace anything inside the ability text.
 
 These match only the exact text of the regex within the line, not the entire line.
@@ -274,6 +274,7 @@ Good guidelines for getting good logs are:
 ### Software prerequisites
 
 * [Python 3](https://www.python.org/downloads/release/python-373/)
+* [Node.js](https://nodejs.org/en/)
 * A copy of cactbot's [source code](https://github.com/quisquous/cactbot/archive/main.zip)
 
 You should do a system-wide installation of Python 3 if you can,
@@ -298,25 +299,31 @@ so the triggers file is always required.
 An initial triggers file should look like the following:
 
 ```javascript
-'use strict';
-
-[{
+export default {
   zoneId: ZoneId.CapeWestwind,
   timelineFile: 'cape_westwind.txt',
   triggers: [
   ],
-}];
+};
 ```
 
 (3) Update the manifest file.
 
-Update **ui/raidboss/data/manifest.txt** with both the name of the
+Update **ui/raidboss/data/raidboss_manifest.txt** with both the name of the
 new triggers file and the new timeline file.
 
-(4) Reload raidboss
+(4) Build cactbot.
 
+Run `npm run build` in the cactbot source directory.
+If you never run `npm install` before, you'll need to do that first.
+
+(5) Reload raidboss
+
+Make sure the raidboss URL is pointed to `dist/ui/raidboss/raidboss.html`.
 If you've changed any of these files, reload your cactbot raidboss
 plugin to pick up the changes.
+
+If you are using `webpack-dev-server`, it will automatically reload whenever you change the source files.
 
 ### Generating an initial timeline file
 
@@ -474,8 +481,8 @@ Run the command again with this ignore to have a cleaned up version:
 `python util/make_timeline.py -f CapeWestwind.log -s 18:42:23.614 -e 18:49:22.934 -ii 0A 2CD 2CE 194 14`
 
 At this point, it may also be worth going through and finding other lines to add.
-Usually, these are [added combatant](LogGuide.md#03-addcombatant) lines
-or [game log lines](LogGuide.md#00-logline) for rp text.
+Usually, these are [added combatant](LogGuide.md#line-03-0x03-addcombatant) lines
+or [game log lines](LogGuide.md#line-00-0x00-logline) for rp text.
 You can look at the time and figure out where they go yourself.
 (Patches welcome to add either of these into **make_timeline.py** automatically.)
 
@@ -519,18 +526,15 @@ for clarity.
 ```
 
 It's pretty clear that there's a loop of roughly 27.8 or 27.9 seconds.
-Let's just assume it's 27.8
+Let's just assume it's 27.8.
 
-The best tool for making perfect loops is **util/timeline_adjust.py**.
-This script will walk through a timeline file and print out the same
-timeline file, adjusted by any amount, positive or negative.
-(Note: it will not adjust jumps.)
+If you are using VSCode, you should use the [adjust time feature](https://github.com/MaikoTan/cactbot-highlight#adjust-time) from the [Cactbot Highlight](https://marketplace.visualstudio.com/items?itemName=MaikoTan.cactbot-highlight) extension,
+which offer a simple way to adjust time in one-click.
+This will not adjust jumps.
 
-Here's an abbreviated version of the output from running this command:
+Here's an abbreviated version of the output after adjusting the time:
 
 ```bash
-python util/timeline_adjust.py --file=ui/raidboss/data/timelines/cape_westwind.txt --adjust=27.8
-
 29.8 "Shield Skewer" sync /:Rhitahtyn sas Arvina:471:/
 38.4 "Shield Skewer" sync /:Rhitahtyn sas Arvina:471:/
 46.8 "Shield Skewer" sync /:Rhitahtyn sas Arvina:471:/
@@ -558,7 +562,7 @@ at least make a loop that goes 30 seconds ahead.
 
 Here's what a completed version of the first phase loop looks like.
 
-Note that we've used the times from **timeline_adjust.py** rather
+Note that we've used adjusted times rather
 than the original times.
 This is so that when we jump from 52.2 to 24.4 that all of the
 relative times stay the same.  In both cases when `Gate Of Tartarus`
@@ -637,10 +641,8 @@ with manually added blank lines to break out the loops.
 
 It looks like there's a clear loop here,
 where every iteration of the loop has 2x `Firebomb` and 2x `Shield Skewer`.
-The loop time is 34.6.  Time to break out **timeline_adjust.py** again.
-
-Running `python util/timeline_adjust.py --file=ui/raidboss/data/timelines/cape_westwind.txt --adjust=27.8`,
-the relevant output is:
+The loop time is 34.6.
+After adjusting the time again, it looks like this:
 
 ```bash
 234.6 "Shield Skewer" sync /:Rhitahtyn sas Arvina:471:/
@@ -660,8 +662,7 @@ If you want to be more precise,
 this is where you would compare against some other runs.
 
 However, this is good enough for Cape Westwind,
-so we will replace the second loop with this output
-from **timeline_adjust.py**.
+so we will replace the second loop with adjusted output.
 
 The current state of our timeline is now:
 
@@ -726,8 +727,6 @@ Unfortunately, the boss uses `Gate of Tartarus` in phase 1,
 so we can't add it using `-p` like we did for phase 2.
 (Patches welcome to add more options to make this possible?)
 
-Instead, we can just use **timeline_adjust.py** to just
-shift the timeline forward automatically.
 If we adjust the original timeline by 400-175.8=224.2
 then we can start phase 3 at t=400.
 
@@ -769,21 +768,19 @@ added back in:
 Without recorded video, it's not 100% clear from the logs
 whether the `Shrapnel Shell` is part of phase 3 or phase 4.
 I know from observation that `Magitek Missiles` is the last phase,
-so because the Shrapnel Shell breaks the pattern let's assume
+so because the `Shrapnel Shell` breaks the pattern let's assume
 it starts phase 4.
 We'll test this later.
 
 It looks a bit like there's another loop just like phase 2.
 
 One consideration is to see if it's exactly the same as phase 2.
-You can use **timeline_adjust.py** with an adjustment of 208.7
+You can move the abilities with an adjustment of 208.7
 to move phase 2's `Shield Skewer` on top of phase 3.
 However, you can see from that output that it's not quite the same.
 Therefore, we'll need to build phase 3 separately.
 
-It's pretty clear that this loop is also a 36.2 second loop.
-Using **timeline_adjust.py** with a 36.2 adjustment gets
-this output:
+A 36.2 adjustment gets this output:
 
 ```bash
 445.0 "Shield Skewer" sync /:Rhitahtyn sas Arvina:471:/
@@ -852,7 +849,7 @@ Here's the final command line, including this second phase:
 ```
 
 This sure looks like a 40.2 second loop.
-Using **timeline_adjust.py**, with a 40.2 second adjustment,
+With a 40.2 second adjustment,
 we get the following output:
 
 ```bash
@@ -878,7 +875,7 @@ In general, most timelines should include some boilerplate at the top like this:
 hideall "--Reset--"
 hideall "--sync--"
 
-0.0 "--Reset--" sync / 21:........:40000010:/ window 10000 jump 0
+0.0 "--Reset--" sync / 21:........:4000000F:/ window 10000 jump 0
 
 0 "Start"
 0.0 "--sync--" sync /:Engage!/ window 0,1
@@ -894,7 +891,7 @@ There can be anything in the text, it is just called `--sync--` for convenience.
 
 It's good practice to have a Reset line to stop the timeline when there's a wipe.
 On fights where the entire zone resets (e.g. all of omegascape, a4s, a8s, a12s, t9, t13),
-`sync / 21:........:40000010:/` is a good sync to use.
+`sync / 21:........:4000000F:/` is a good sync to use.
 On fights with zones that seal and unseal, (e.g. a1s,  t1-8)
 you should use the zone sealing message itself to reset.
 
@@ -985,7 +982,7 @@ loops are on less frequent abilities just to be more careful.
 hideall "--Reset--"
 hideall "--sync--"
 
-0.0 "--Reset--" sync / 21:........:40000010:/ window 10000 jump 0
+0.0 "--Reset--" sync / 21:........:4000000F:/ window 10000 jump 0
 
 ### Phase 1: skewers and stuns
 0 "Start"

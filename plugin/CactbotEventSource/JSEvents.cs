@@ -70,9 +70,6 @@ namespace Cactbot {
       public string EventName() { return "onPlayerDied"; }
     }
 
-    public class PartyWipeEvent : JSEvent {
-      public string EventName() { return "onPartyWipe"; }
-    }
     public class FateEvent : JSEvent {
       public FateEvent(string eventType, int fateID, int progress) {
         this.eventType = eventType;
@@ -139,7 +136,7 @@ namespace Cactbot {
 
       public Point3F pos;
       public float rotation;
-      public int bait;
+      public uint bait;
 
       // One of the FooJobDetails structures, depending on the value of |job|.
       public object jobDetail;
@@ -195,19 +192,6 @@ namespace Cactbot {
       public string EventName() { return "onDataFilesRead"; }
 
       public Dictionary<string, string> files;
-    }
-
-    public class OnInitializeOverlay : JSEvent {
-      public OnInitializeOverlay(string location, Dictionary<string, string> files, string language) {
-        this.userLocation = location;
-        this.localUserFiles = files;
-        this.language = language;
-      }
-
-      public string EventName() { return "onInitializeOverlay"; }
-      public string userLocation;
-      public Dictionary<string, string> localUserFiles;
-      public string language;
     }
   }
 }

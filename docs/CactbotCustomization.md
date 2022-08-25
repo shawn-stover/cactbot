@@ -1,6 +1,6 @@
 # Cactbot Customization
 
-🌎 [**English**] [[简体中文](./zh-CN/CactbotCustomization.md)] [[한국어](./ko-KR/CactbotCustomization.md)]
+🌎 [**English**] [[简体中文](./zh-CN/CactbotCustomization.md)] [[繁體中文](./zh-TW/CactbotCustomization.md)] [[한국어](./ko-KR/CactbotCustomization.md)]
 
 - [Using the cactbot UI](#using-the-cactbot-ui)
 - [Changing Trigger Text with the cactbot UI](#changing-trigger-text-with-the-cactbot-ui)
@@ -50,13 +50,13 @@ ACT -> Plugins -> OverlayPlugin.dll -> Cactbot -> Raidboss,
 there are individual trigger listings.
 You can use these listings to change various exposed configuration settings per trigger.
 
-Settings with a bell (🔔) next to their name are trigger mostly outputs that you can override.
-For example, maybe there's an 🔔onTarget field whose text is `Tank Buster on ${name}`.
+Settings with a bell (🔔) next to their name are trigger outputs that you can override.
+For example, maybe there's an 🔔onTarget field whose text is `Tank Buster on ${player}`.
 This is the string that will get played on screen (or via tts) when there is a tank buster on some person.
-`${name}` here is a parameter that will be set dynamically by the trigger.
+`${player}` here is a parameter that will be set dynamically by the trigger.
 Anything that looks like `${param}` is such a dynamic parameter.
 
-You could change this to say `${name} is going to die!` instead.
+You could change this to say `${player} is going to die!` instead.
 Or, maybe you don't care who it's on, and you can edit the text to `Buster` to be brief.
 If you want to undo your overriding, just clear the text.
 
@@ -77,14 +77,37 @@ and so you might need a little bit of programming savvy.
 The general philosophy of cactbot is that
 any user configuration should only go in files in the user directory.
 This will prevent your changes from being overwritten during future cactbot updates.
-Additionally, in the future modifying cactbot files directly from a cactbot release
+Additionally, modifying cactbot files directly from a cactbot release
 will not work properly without running extra build steps.
 
 All cactbot UI modules can load user settings from the [user/](../user/) directory.
-The `raidboss` module loads `user/raidboss.js` and `user/raidboss.css`.
-The `oopsyraidsy` module loads `user/oopsyraidsy.js` and `user/oopsyraidsy.css`.
-And so on, for each module.
-These files are included after cactbot's files and can override its settings.
+The `raidboss` module loads `user/raidboss.js` and `user/raidboss.css`,
+as well as any `.js` and `.css` files inside the `user/raidboss/` directory
+with any filenames in any number of subfolders.
+(Timeline `.txt` files must be directly in the same folder as the `.js` that refers to them.)
+These user-defined files are included after cactbot's files and can override its settings.
+
+Similarly, the `oopsyraidsy` module loads `user/oopsyraidsy.js` and `user/oopsyraidsy.css`,
+as well as all `.js` and `.css` files inside the `user/oopsyraidsy/` directory.
+And so on, for each module by name.
+
+cactbot loads files in subdirectories (alphabetically) before loading files in outer directories.
+This is so that `user/raidboss.js` will always be loaded last
+and can override anything that is set inside a file inside of `user/raidboss/`.
+For example, `user/alphascape/some_file.js` will load before `user/mystatic/some_file.js`,
+which will both load before `user/raidboss.js`.
+The same ordering applies to `.css` files.
+
+In this documentation, any reference to "user-defined js file" applies to both of these.
+There is no difference between `user/raidboss.js` and `user/raidboss/some_file.js`,
+other than the order in which they load.
+Similarly, "user-defined css file" means both `user/radar.css` and `user/radar/some_file.css`.
+Subdirectories in the user folder are intended to
+make it easier to share triggers and customizations with others.
+
+You can get more information about the loading order
+by looking at the [debug messages](#check-if-your-file-is-loaded)
+when developer mode is turned on.
 
 The `user/` directory already includes some example configuration files,
 which you can rename and use.
@@ -111,13 +134,13 @@ This is often in `%APPDATA%\Advanced Combat Tracker\Plugins\cactbot-version\cact
 
 ## Customizing Appearance
 
-The `user/<name>.css` file can change positions, sizes, colors, etc. for components of
+A user-defined css file can change positions, sizes, colors, etc. for components of
 the UI module. See the `ui/<name>/<name>.css` to find the selectors you can modify.
 
 For example in [ui/raidboss/raidboss.css](../ui/raidboss/raidboss.css),
 you see the `#popup-text-container` and `#timeline-container`
 which can be changed via `user/raidboss.css` to different positions as desired.
-You can use `user/raidboss.css` to add additional styling.
+You can use `user/raidboss.css` or a `.css` file in `user/raidboss/` to add additional styling.
 
 The size and color of info text alerts can also be changed
 by making a CSS rule for the `.info-text` class such as below:
@@ -153,13 +176,22 @@ In general, you are on your own if you want to style cactbot with CSS.
 
 ## Overriding Raidboss Triggers
 
-You can use your `cactbot/user/raidboss.js` to override how triggers behave.
+You can use a user-defined js file
+(e.g. `user/raidboss.js` or any `.js` file under `user/raidboss/`)
+to override how triggers behave.
 You can change the text that they output,
 what jobs they run for,
 and how long they stay on screen,
 and anything else.
 
-In `cactbot/user/raidboss.js`,
+You can see readable JavaScript versions of all of the cactbot triggers
+in this branch: <https://github.com/quisquous/cactbot/tree/triggers>
+This is the preferred reference to use for viewing, copying, and pasting.
+Triggers in the main branch
+or shipped in a cactbot release are often in unreadable bundles
+or are TypeScript which is not supported in user folders.
+
+In your user-defined js file for raidboss,
 there is an `Options.Triggers` list that contains a list of trigger sets.
 You can use this to append new triggers and
 modify existing triggers.
@@ -171,7 +203,7 @@ it is worth reading the [trigger guide](RaidbossGuide.md)
 to understand what the various fields of each trigger means.
 
 In general, the pattern to follow is to add a block of code
-to your `cactbot/user/raidboss.js` line that looks like this:
+to your user-defined js file (e.g. `user/raidboss.js`) that looks like this:
 
 ```javascript
 Options.Triggers.push({
@@ -191,9 +223,9 @@ The easiest approach to modify triggers is to copy and paste the block of code
 above for each trigger.
 Modify the `zoneId` line to have the zone id for the zone you care about,
 usually from the top of the cactbot trigger file.
-[This file](../resources/zone_id.js) has a list of all the zone ids.
+[This file](../resources/zone_id.ts) has a list of all the zone ids.
 If you specify one incorrectly, you will get a warning in the OverlayPlugin log window.
-Then, copy the trigger text into this block.
+Then, [copy the trigger text](https://github.com/quisquous/cactbot/tree/triggers) into this block.
 Edit as needed.
 Repeat for all the triggers you want to modify.
 Reload your raidboss overlay to apply your changes.
@@ -216,9 +248,9 @@ you could do this via [Changing Trigger Text with the cactbot UI](#changing-trig
 
 One way to adjust this is to edit the trigger output for this trigger.
 You can find the original fireball #1 trigger in
-[ui/raidboss/data/04-sb/ultimate/unending_coil_ultimate.js](https://github.com/quisquous/cactbot/blob/cce8bc6b10d2210fa512bd1c8edd39c260cc3df8/ui/raidboss/data/04-sb/ultimate/unending_coil_ultimate.js#L715-L743).
+[ui/raidboss/data/04-sb/ultimate/unending_coil_ultimate.js](https://github.com/quisquous/cactbot/blob/triggers/04-sb/ultimate/unending_coil_ultimate.js#:~:text=UCU%20Nael%20Fireball%201).
 
-This chunk of code is what you would paste into the bottom of your `cactbot/user/raidboss.js` file.
+This chunk of code is what you would paste into the bottom of your user-defined js file.
 
 ```javascript
 Options.Triggers.push({
@@ -227,11 +259,6 @@ Options.Triggers.push({
     {
       id: 'UCU Nael Fireball 1',
       netRegex: NetRegexes.ability({ source: 'Ragnarok', id: '26B8', capture: false }),
-      netRegexDe: NetRegexes.ability({ source: 'Ragnarök', id: '26B8', capture: false }),
-      netRegexFr: NetRegexes.ability({ source: 'Ragnarok', id: '26B8', capture: false }),
-      netRegexJa: NetRegexes.ability({ source: 'ラグナロク', id: '26B8', capture: false }),
-      netRegexCn: NetRegexes.ability({ source: '诸神黄昏', id: '26B8', capture: false }),
-      netRegexKo: NetRegexes.ability({ source: '라그나로크', id: '26B8', capture: false }),
       delaySeconds: 35,
       suppressSeconds: 99999,
       // The infoText is what appears on screen in green.
@@ -256,16 +283,16 @@ This edit also removed languages other than English.
 Currently, provoke only works for players in your alliance and not for all jobs.
 This example shows how to make it work for all players.
 The provoke trigger can be found in
-[ui/raidboss/data/00-misc/general.js](https://github.com/quisquous/cactbot/blob/cce8bc6b10d2210fa512bd1c8edd39c260cc3df8/ui/raidboss/data/00-misc/general.js#L11-L30).
+[ui/raidboss/data/00-misc/general.js](https://github.com/quisquous/cactbot/blob/triggers/00-misc/general.js#:~:text=General%20Provoke).
 
 Here is a modified version with a different `condition` function.
 Because this shares the same `General Provoke` id with the built-in cactbot trigger,
 it will override the built-in version.
 
-This chunk of code is what you would paste into the bottom of your `cactbot/user/raidboss.js` file.
+This chunk of code is what you would paste into the bottom of your user-defined js file.
 
 ```javascript
-Options.Triggers.push([{
+Options.Triggers.push({
   zoneId: ZoneId.MatchAll,
   triggers: [
     {
@@ -289,7 +316,7 @@ Options.Triggers.push([{
       },
     },
   ],
-]);
+});
 ```
 
 You could also just delete the `condition` function entirely here,
@@ -303,25 +330,21 @@ Here's an example of a custom trigger that prints "Get out!!!",
 one second after you receive an effect called "Forked Lightning".
 
 ```javascript
-Options.Triggers.push([
-  {
-    zoneId: ZoneId.MatchAll,
-    triggers: [
-      {
-        // This id is made up, and is not overriding a cactbot trigger.
-        id: 'Personal Forked Lightning',
-        regex: Regexes.gainsEffect({ effect: 'Forked Lightning' }),
-        condition: (data, matches) => { return matches.target === data.me; },
-        delaySeconds: 1,
-        alertText: 'Get out!!!',
-      },
+Options.Triggers.push({
+  zoneId: ZoneId.MatchAll,
+  triggers: [
+    {
+      // This id is made up, and is not overriding a cactbot trigger.
+      id: 'Personal Forked Lightning',
+      regex: Regexes.gainsEffect({ effect: 'Forked Lightning' }),
+      condition: (data, matches) => { return matches.target === data.me; },
+      delaySeconds: 1,
+      alertText: 'Get out!!!',
+    },
 
-      // ... other triggers here, if you want
-    ],
-  },
-
-  // ... other zones here, if you want
-]);
+    // ... other triggers here, if you want
+  ],
+});
 ```
 
 Your best resources for learning how to write cactbot triggers
@@ -330,7 +353,12 @@ and also reading through existing triggers in [ui/raidboss/data](../ui/raidboss/
 
 ## Overriding Raidboss Timelines
 
-Overriding a raidboss timeline is similar to [overriding a trigger](#overriding-raidboss-triggers).
+Some customization of timelines can be done via the [cactbot config UI](#using-the-cactbot-ui).
+This UI allows you to hide/rename existing timeline entries
+or add custom entries at particular times.
+
+This section is for when you need to do more than that, and want to replace a timeline entirely.
+Completely overriding a raidboss timeline is similar to [overriding a trigger](#overriding-raidboss-triggers).
 
 The steps to override a timeline are:
 
@@ -386,10 +414,18 @@ when their names are called out
 ```javascript
 Options.PlayerNicks = {
   // 'Firstname Lastname': 'Nickname',
-  'Banana Nana', 'Nana',
-  'The Great\'one', 'Joe', // The Great'one => Joe, needs a backslash for the apostrophe
+  'Banana Nana': 'Nana',
+  'The Great\'one': 'Joe', // The Great'one => Joe, needs a backslash for the apostrophe
   'Viewing Cutscene': 'Cut',
   // etc, with more nicknames
+};
+```
+
+You can override text-to-speech callouts globally via
+
+```javascript
+Options.TransformTts = (text) => {
+  return text.replace('a', 'b');
 };
 ```
 
@@ -399,6 +435,22 @@ This can be confusing,
 so it's generally preferable to let the config tool set everything you can,
 and only use user files in order to set things that the config tool does not
 provide access to.
+
+## Global Trigger File Imports
+
+User files are `eval`'d in JavaScript,
+and thus cannot `import` in the same way that built-in trigger files do.
+User javascript files have access to the following globals:
+
+- [Conditions](../resources/conditions.ts)
+- [ContentType](../resources/content_type.ts)
+- [NetRegexes](../resources/netregexes.ts)
+- [Regexes](../resources/regexes.ts)
+- [Responses](../resources/responses.ts)
+- [Outputs](../resources/outputs.ts)
+- [Util](../resources/util.ts)
+- [ZoneId](../resources/zone_id.ts)
+- [ZoneInfo](../resources/zone_info.ts)
 
 ## Debugging User Files
 
@@ -424,6 +476,8 @@ It will list lines for each local user file it loads:
 
 Verify that your user file is loaded at all.
 
+The order that the filenames are printed is the order in which they are loaded.
+
 ### Check if your user file has errors
 
 User files are JavaScript, and so if you write incorrect JavaScript, there will be errors
@@ -433,8 +487,8 @@ Check the OverlayPlugin log for errors when loading.
 Here's an example:
 
 ```log
-[10/19/2020 6:18:27 PM] Info: raidbossy: BrowserConsole: local user file: C:\Users\tinipoutini\cactbot\user\raidboss.js (Source: file:///C:/Users/tinipoutini/cactbot/resources/user_config.js, Line: 83)
-[10/19/2020 6:18:27 PM] Info: raidbossy: BrowserConsole: *** ERROR IN USER FILE *** (Source: file:///C:/Users/tinipoutini/cactbot/resources/user_config.js, Line: 95)
+[10/19/2020 6:18:27 PM] Info: raidbossy: BrowserConsole: local user file: C:\Users\tinipoutini\cactbot\user\raidboss.js (Source: file:///C:/Users/tinipoutini/cactbot/resources/user_config.ts, Line: 83)
+[10/19/2020 6:18:27 PM] Info: raidbossy: BrowserConsole: *** ERROR IN USER FILE *** (Source: file:///C:/Users/tinipoutini/cactbot/resources/user_config.ts, Line: 95)
 [10/19/2020 6:18:27 PM] Info: raidbossy: BrowserConsole: SyntaxError: Unexpected token :
-    at loadUser (file:///C:/Users/tinipoutini/cactbot/resources/user_config.js:92:28) (Source: file:///C:/Users/tinipoutini/cactbot/resources/user_config.js, Line: 96)
+    at loadUser (file:///C:/Users/tinipoutini/cactbot/resources/user_config.ts:92:28) (Source: file:///C:/Users/tinipoutini/cactbot/resources/user_config.ts, Line: 96)
 ```

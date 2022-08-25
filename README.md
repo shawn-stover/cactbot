@@ -5,6 +5,8 @@
 [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/quisquous/cactbot/Test/main)](https://github.com/quisquous/cactbot/actions?query=workflow%3ATest+branch%3Amain)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/quisquous/cactbot?color=brightgreen&sort=semver)](https://github.com/quisquous/cactbot/releases/latest)
 
+🌎 [**English**] [[简体中文](docs/zh-CN/README.md)] [[한국어](docs/ko-KR/README.md)]
+
 1. [About](#about)
 1. [Installing](#installing)
 1. [Building From Source](#building-from-source)
@@ -15,7 +17,7 @@
 
 ## About
 
-cactbot is an ACT overlay that provides raiding tools for [Final Fantasy XIV](http://www.finalfantasyxiv.com/).  This project is an overlay plugin for
+cactbot is an ACT overlay that provides raiding tools for [Final Fantasy XIV](http://www.finalfantasyxiv.com/). This project is an overlay plugin for
 [ngld's OverlayPlugin](https://github.com/ngld/OverlayPlugin)
 which itself is a plugin for
 [Advanced Combat Tracker](http://advancedcombattracker.com/).
@@ -51,11 +53,6 @@ cactbot provides these modules:
 
 ![xephero screenshot](screenshots/xephero.png)
 
-### Video Examples
-
-* [O4S raidboss + monk jobs](https://www.twitch.tv/videos/209562337)
-* [O3S spellblade callouts](https://clips.twitch.tv/StrangeHungryGarageShadyLulu)
-
 ## Installing
 
 ### Dependencies
@@ -77,14 +74,10 @@ click on `Options` and then click on `Show Startup Wizard`.
 
 In the startup wizard,
 select `FFXIV Parsing Plugin` and then click the `Download/Enable Plugin` button.
-This will download `%APPDATA%Advanced Combat Tracker\Plugins\FFXIV_ACT_Plugin.dll`
+This will download `%APPDATA%\Advanced Combat Tracker\Plugins\FFXIV_ACT_Plugin.dll`
 and enable it in the list of plugins.
 
 ![startup wizard download screenshot](screenshots/ffxiv_plugin_parsing_plugin.png)
-
-Additionally, you must enable parsing from the network and make sure that ACT is not firewalled.
-Make sure the settings for the FFXIV plugin have the "Include HP for Triggers" button checked.
-This is under `Plugins` ->`FFXIV Settings` -> `Parse Options`.
 
 Alternative FFXIV Plugin Guides:
 
@@ -105,7 +98,7 @@ Select `Overlay Plugin` and then click `Download and Enable`.
 ![overlay plugin selection screenshot](screenshots/get_plugins_overlayplugin.png)
 
 This will download the ngld OverlayPlugin into
-`%APPDATA%Advanced Combat Tracker\Plugins\OverlayPlugin`
+`%APPDATA%\Advanced Combat Tracker\Plugins\OverlayPlugin`
 and enable `OverlayPlugin.dll` in the list of plugins.
 
 As a note, you must use the [ngld](https://github.com/ngld) version of
@@ -121,7 +114,7 @@ Select `Cactbot` and then click `Download and Enable`.
 ![cactbot selection screenshot](screenshots/get_plugins_cactbot.png)
 
 This will download the cactbot into
-`%APPDATA%Advanced Combat Tracker\Plugins\cactbot-version\cactbot`
+`%APPDATA%\Advanced Combat Tracker\Plugins\cactbot-version\cactbot`
 and enable `CactbotOverlay.dll` in the list of plugins.
 
 **Note**: Due to a difference in how ACT expects archives to be
@@ -130,9 +123,15 @@ there will be something like a `cactbot-0.15.2` folder
 that corresponds to the initial version that you downloaded cactbot.
 This folder name does not matter and is cosmetic.
 
-Verify your plugins are in the correct order.
-The order should be: FFXIV Plugin first, then OverlayPlugin, then cactbot.
-If you have followed the above instructions, it should look like the following:
+### Plugin Load Order
+
+Because of cactbot’s dependencies,
+cactbot must be loaded after both OverlayPlugin and the FFXIV ACT plugin.
+Verify that your plugins are in this order:
+
+* FFIXV_ACT_Plugin.dll
+* OverlayPlugin.dll
+* CactbotOverlay.dll
 
 ![plugin order](screenshots/get_plugins_complete.png)
 
@@ -183,7 +182,7 @@ To install dependencies there are 2 methods: **per script** and **manually**
 ### Dependencies: Script Method
 
 1. `curl` MUST be installed (this is used to download dependencies)
-1. Execute the `./utils/fetch_deps.py` script
+1. Execute the `./util/fetch_deps.py` script
 1. Continue with **Steps to build**
 
 ### Dependencies: Manual Method
@@ -227,18 +226,34 @@ ThirdParty
    |- OverlayPlugin.dll
 ```
 
-### Steps to build
+### Steps to build plugin
 
 1. Open the solution in Visual Studio (tested with Visual Studio 2017).
 1. Build for "Release" and "x64".
 1. The plugin will be built as **bin/x64/Release/CactbotOverlay.dll**.
 1. Add the built plugin directly as an ACT plugin.  In the ACT -> Plugins -> Plugin Listing tab, click the `Browse` button and find the **bin/x64/Release/CactbotOverlay.dll** where this file was built.  Then click `Add/Enable Plugin`.
 
+### npm and webpack
+
+If you are not a cactbot developer
+and are trying to modify cactbot for your own personal triggers,
+you should instead refer to the [customization documentation](docs/CactbotCustomization.md)
+instead of changing your local cactbot files.
+
+To install npm and start Webpack, follow these steps:
+
+1. Install [nodejs and npm](https://nodejs.org/en/download/)
+1. Run `npm install` in the root of the cactbot directory.
+1. Run `npm run build` or `npm start`.
+
+See the [contributing](CONTRIBUTING.md#validating-changes-via-webpack) documentation
+for more details about using Webpack.
+
 ## UI module overview
 
 The [ui/](ui/) directory contains cactbot's ui modules.
 If you installed cactbot following the instructions above,
-this will most likely be `%APPDATA%Advanced Combat Tracker\Plugins\cactbot-version\cactbot\ui\`.
+this will most likely be `%APPDATA%\Advanced Combat Tracker\Plugins\cactbot-version\cactbot\ui\`.
 
 Each cactbot ui module should be added as a separate overlay.
 See the [Adding Overlay Modules](#adding-overlay-modules) section for more details about setup.
@@ -252,7 +267,12 @@ This module provides a visual timeline of upcoming events in a fight, as well as
 notifications to help increase raid awareness. Text and sound alerts can be based on the fight
 timeline, or come from log messages that occur in the game, similar to ACT's "Custom Triggers".
 The module is designed to look and feel similar to the
-[BigWigs Bossmods](https://mods.curse.com/addons/wow/big-wigs) addon for World of Warcraft.
+[BigWigs Bossmods](https://www.curseforge.com/wow/addons/big-wigs) addon for World of Warcraft.
+
+[This page](https://quisquous.github.io/cactbot/util/coverage/coverage.html) lists
+the currently supported set of content in cactbot.
+Support is continually added over time (patches welcome!)
+but a lot of old content may not be supported yet.
 
 Fight timelines are provided in files designed for the [ACT Timeline](https://github.com/grindingcoil/act_timeline)
 plugin, [documented here](http://dtguilds.enjin.com/forum/m/37032836/viewthread/26353492-act-timeline-plugin)
@@ -261,8 +281,7 @@ with [some extensions](docs/TimelineGuide.md).
 There are three levels of text alerts, in order of escalating importance: `info`, `alert`, and `alarm`.
 Text messages will be in one of these, and more important levels are larger and more eye grabbing colors.  Text-to-speech can be configured if you prefer that over on screen text.
 
-Timeline files are found in [ui/raidboss/data/timelines](ui/raidboss/data/timelines). Triggers
-for text and sound alerts are found in [ui/raidboss/data/triggers](ui/raidboss/data/triggers).
+Timeline files and triggers for text and sound alerts are found in [ui/raidboss/data](ui/raidboss/data), timeline files with `.txt` extension and trigger files with `.ts` extension.
 
 In this screenshot, the raidboss module is highlighted, with the timeline circled in red, and the
 text alerts circled in yellow, with an `alert`-level text message visible.
@@ -278,18 +297,29 @@ This currently can only be loaded in a browser and not as an overlay.
 This will work in current version of Chrome,
 and should work in other browsers as well but this is less tested.
 
-Instructions:
+If you want the emulator to use your ACT settings and user triggers,
+you will need to enable the OverlayPlugin WS Server via the following instructions:
 
 1. Start ACT.
-1. Make sure the WS Server is started via Plugins -> OverlayPlugin WSServer -> Stream/Local Overlay.
-1. Select `Cactbot Raidboss (Combined Alerts and Timelines)` from the URL Generator list.
-1. Edit the url to say `raidemulator.html` instead of `raidboss.html`.
-1. Copy and paste this edited url into Chrome.
+1. Start the WS Server via Plugins -> OverlayPlugin WSServer -> Stream/Local Overlay.
+
+If you're developing triggers for the cactbot repository,
+you can start a local development server via `npm run start`
+and load the overlay in Chrome via `http://127.0.0.1:8080/ui/raidboss/raidemulator.html?OVERLAY_WS=ws://127.0.0.1:10501/ws`
+
+If you're developing user triggers,
+you can load the overlay in Chrome via `https://quisquous.github.io/cactbot/ui/raidboss/raidemulator.html?OVERLAY_WS=ws://127.0.0.1:10501/ws`
+
+If you're trying to reproduce an issue,
+you can load the overlay in Chrome via `https://quisquous.github.io/cactbot/ui/raidboss/raidemulator.html`.
+You don't need the WS Server running in this case.
+
+Once you've got the overlay loaded, you can follow these instructions to use the emulator.
+
 1. Drag and drop a [network log](/docs/FAQ-Troubleshooting.md#how-to-find-a-network-log) onto the page.
 1. Select the zone and encounter, and then click `Load Encounter`.
 
 If the emulator is not working, check the console log in the inspector for errors.
-No buttons will work until it is connected to ACT via websocket.
 
 ![raidboss emulator screenshot](screenshots/raidboss_emulator.png)
 
@@ -308,25 +338,52 @@ Mistake triggers are specified for individual fights in the [ui/oopsyraidsy/data
 
 ![oopsy screenshot](screenshots/promo_oopsy.png)
 
+You can copy oopsy lines to the clipboard by clicking them.
+(You may need to uncheck `Enable Clickthrough` checkbox from the OverlayPlugin option.)
+
 ### [jobs](ui/jobs) module
 
 To use this module,
 point cactbot at **ui/jobs/jobs.html** or use the `Cactbot Jobs` preset.
 
-This module provides health, mana, and tp bars, as well as icons and timer bars for big raid buffs such as
+This module provides health and mana bars, as well as icons and timer bars for big raid buffs such as
 The Balance and Trick Attack. It also features a food buff warning to keep up your food buff when leveling
 or raiding, and a visual pull countdown.
 
 It has more fleshed out support for some jobs but is *strongly* a Work In Progress for others.
 
-* Red Mage: Shows white/black mana, tracks procs for Verstone, Verfire and Impact, and shows the state of the melee combo in progress.
-* Warrior: Shows the beast amount, and tracks the remaining Storm's Eye buff time in gcds.
-* Monk: Shows chakra count, remaining greased lightning time, and tracks monk buffs and debuffs.
+<details>
+<summary>Supported Jobs (Click to expand)</summary>
+
+|Job|Feature|
+|:-:|:-:|
+|<img src="./resources/ffxiv/jobs/pld-large.png" width="30px"/><br> Paladin|Shows Oath amount, and atonement stacks, DoT remaining time, Fight or Flight duration/cooldown, Expiacion cooldown and shows combo time remaining.|
+|<img src="./resources/ffxiv/jobs/war-large.png" width="30px"/><br> Warrior|Shows Beast amount, Surging Tempest duration, Upheaval and Inner Release cooldown, and shows combo time remaining.|
+|<img src="./resources/ffxiv/jobs/drk-large.png" width="30px"/><br> Dark Knight|Shows the blood amount and darkside time, BloodWeapon and Delirium and LivingShadow duration/cooldown, and shows combo time remaining.|
+|<img src="./resources/ffxiv/jobs/gnb-large.png" width="30px"/><br> Gunbreaker|Shows No Mercy duration/cooldown, Bloodfest and Gnashing Fang cooldown, Cartridge amount, and shows combo time remaining.|
+|<img src="./resources/ffxiv/jobs/whm-large.png" width="30px"/><br> White Mage|Shows Heal and Blood Lily amount, time to next Lily, DoTs remaining time, and shows Assize and Lucid Dreaming cooldown.|
+|<img src="./resources/ffxiv/jobs/sch-large.png" width="30px"/><br> Scholar|Shows Aetherflow stacks, Fairy gauge amount/time remaining, DoTs remaining time, and shows Aetherflow and Lucid Dreaming cooldown.|
+|<img src="./resources/ffxiv/jobs/ast-large.png" width="30px"/><br> Astrologian|Shows Astrosigns amount, notify who or whether to play the current card, DoTs remaining time, and shows Draw and Lucid Dreaming cooldown.|
+|<img src="./resources/ffxiv/jobs/sge-large.png" width="30px"/><br> Sage|Shows Addersgall and Addersting stacks, time to next Addersgall, DoTs remaining time, and shows Phlegma and Rhizomata and Lucid Dreaming cooldown.|
+|<img src="./resources/ffxiv/jobs/mnk-large.png" width="30px"/><br> Monk|Shows chakra count and form time, and tracks monk buffs and debuffs.|
+|<img src="./resources/ffxiv/jobs/drg-large.png" width="30px"/><br> Dragoon|Shows blood and eye amount, remaining Disembowel time, jump cooldown, and Lance Charge and Dragon Sight duration/cooldown.|
+|<img src="./resources/ffxiv/jobs/nin-large.png" width="30px"/><br> Ninja|Shows Ninki amount, Huton remaining time, Trick Attack duration/cooldown, Bunshin and Mudras cooldown, and shows combo time remaining.|
+|<img src="./resources/ffxiv/jobs/sam-large.png" width="30px"/><br> Samurai|Shows Kenki amount, Meditation stacks, Fugetsu and Fuka and Higanbana duration, Tsubame-gaeshi cooldown, and shows combo time remaining.|
+|<img src="./resources/ffxiv/jobs/rpr-large.png" width="30px"/><br> Reaper|Shows Soul Gauge, Shroud Gauge, Death's Design duration, Soul Slice and Gluttony cooldown, Arcane Circle duration/cooldown, and shows combo time remaining.|
+|<img src="./resources/ffxiv/jobs/brd-large.png" width="30px"/><br> Bard|Shows songs playing and remaining time, Repertoire stack, Soul Voice amount, StraightShotReady track, DoT remaining time, and a bar that show when your DoTs will tick.|
+|<img src="./resources/ffxiv/jobs/mch-large.png" width="30px"/><br> Machinist|Shows Heat gauge, Battery gauge, combo timer, Drill/Bioblaster and Air Anchor and Chain Saw cooldown, Wild Fire cooldown/duration. When Wild Fire is active, there will be a gauge to show how many GCD you have landed.|
+|<img src="./resources/ffxiv/jobs/dnc-large.png" width="30px"/><br> Dancer|Shows combo timer, Feather gauge, Esprit gauge, Standard Step cooldown, Technical Step and Flourish cooldown/duration.|
+|<img src="./resources/ffxiv/jobs/blm-large.png" width="30px"/><br> Black Mage|Shows DoTs remaining time, Firestarter and Thundercloud proc duration, time to next xeno, MP ticker, Fire/Ice stack and umbral heart stack.|
+|<img src="./resources/ffxiv/jobs/smn-large.png" width="30px"/><br> Summoner|Shows Demi-Summoning time, Aetherflow stack, Attunement stacks, Energy Drain cooldown, Trance cooldown, and Lucid Dreaming cooldown.|
+|<img src="./resources/ffxiv/jobs/rdm-large.png" width="30px"/><br> Red Mage|Shows white/black mana, tracks procs for Verstone and Verfire, and Fleche and Contre Sixte cooldown.|
+|<img src="./resources/ffxiv/jobs/blu-large.png" width="30px"/><br> Blue Mage|Shows cooldown of offguard, lucid dreaming, and Song Of Torment DoT remaining time.|
+
+</details>
 
 In this screenshot, the jobs module is highlighted for the Red Mage job. The health and mana bars, as well
 as Red Mage white/black mana tracking is circled in purple, with the large raid buff tracking pointed to
-beside it in orange. The first step of the melee combo has been executed, which is displayed as the yellow
-box above the health bar. The proc tracking is circled below in green.
+beside it in orange. <del>The first step of the melee combo has been executed, which is displayed as the yellow
+box above the health bar.</del> The proc tracking is circled below in green.
 
 ![jobs screenshot](screenshots/Jobs.png)
 
@@ -343,7 +400,7 @@ included on the map.
 It currently does not read the tracker information directly.  However,
 if you click on the left/red "Copy killed NMs" button in the tracker to
 copy the list of currently dead NMs, you can paste it in game, e.g.
-`/echo ? NMs on cooldown: Serket (7m) > Julika (24m) > Poly (54m)`
+`/echo NMs on cooldown: Serket (7m) → Julika (24m) → Poly (54m)`
 
 If you do not see the emoji, make sure you have installed [this Windows update](https://support.microsoft.com/en-us/help/2729094/an-update-for-the-segoe-ui-symbol-font-in-windows-7-and-in-windows-ser).
 
@@ -379,8 +436,6 @@ When you cast your line at a fishing hole, this module keeps track of when you r
 
 Cast times are currently only logged as you fish, so there won't be any data until you've caught each fish. Green bars represent light tugs, yellow is a medium tug and red bars are legendary/heavy tugs.
 
-[See here](https://www.youtube.com/watch?v=GHgWIA-Zhug) for examples of the different tug types.
-
 Check [here](docs/FAQ-Troubleshooting.md#fisher-module) for common troubleshooting tips.
 
 ### [dps](ui/dps) meters
@@ -396,8 +451,8 @@ In the screenshot below the phases are named B1, B2, B3.  These autogenerate fro
 
 ![xephero screenshot](screenshots/xephero.png)
 
-The [rdmty](ui/dps/rdmty) dps meter is based on the same dps meter for miniparse, and updated
-for Stormblood jobs and recolored to match [fflogs](http://fflogs.com).
+The [rdmty](ui/dps/rdmty) dps meter is based on the same dps meter for miniparse, and
+recolored to match [fflogs](http://fflogs.com).
 
 ![rdmty screenshot](screenshots/rdmty.png)
 
@@ -477,7 +532,13 @@ the current Chinese version,
 and the current Korean version.
 Some translations are still a work in progress.
 
-Unicode characters are supported throughout, through the use of the helpers in the
-[resources/regexes.js](resources/regexes.js) file. However [timelines](ui/raidboss/data/timelines)
-and log event [triggers](ui/raidboss/data/triggers) may be incorrect if names that appear in the
-ACT log events are different.
+## Licensing, Trademarks, Copyright
+
+cactbot is open source under the [Apache License, Version 2.0](LICENSE).
+
+FINAL FANTASY is a registered trademark of Square Enix Holdings Co., Ltd.
+
+Final Fantasy art and icons reused non-commercially under the
+[FINAL FANTASY® XIV Materials Usage License](https://support.na.square-enix.com/rule.php?id=5382).
+
+See the [LICENSE](LICENSE) file for more details about other bundled projects.

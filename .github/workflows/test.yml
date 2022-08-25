@@ -2,19 +2,21 @@ name: Test
 
 on:
   push:
+    branches:
+      - main
     paths:
       - '**/*.js'
+      - '**/*.ts'
       - '**/*.py'
+      - 'package*.json'
       - 'ui/raidboss/**'
       - '.github/workflows/test.yml'
   pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
     paths:
       - '**/*.js'
+      - '**/*.ts'
       - '**/*.py'
+      - 'package*.json'
       - 'ui/raidboss/**'
       - '.github/workflows/test.yml'
 
@@ -22,19 +24,28 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v1
-      - name: Setup Node
-        uses: actions/setup-node@v2-beta
+      - uses: actions/checkout@v1
+
+      - uses: actions/setup-node@v2
         with:
-          node-version: '12'
-      - name: Setup Python
-        uses: actions/setup-python@v2
+          node-version: '16'
+
+      - name: Cache Dependencies
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ./node_modules
+          key: modules-${{ hashFiles('package-lock.json') }}
+
+      - uses: actions/setup-python@v2
         with:
           python-version: '3.7'
+
       - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          npm install
+          npm ci --ignore-scripts
+
       - name: npm test
         run: |
           npm test

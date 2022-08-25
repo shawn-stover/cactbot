@@ -2,8 +2,10 @@
 
 1. [General FFXIV ACT Troubleshooting](#general-ffxiv-act-troubleshooting)
 1. [Problems using Cactbot](#problems-using-cactbot)
+1. [Problems during Cactbot installation](#problems-during-cactbot-installation)
 1. [Fisher Module](#fisher-module)
-1. [Other Issues](#other-issues)
+1. [Places to Get Help](#places-to-get-help)
+1. [How To Find A Network Log](#how-to-find-a-network-log)
 
 ## General FFXIV ACT Troubleshooting
 
@@ -70,8 +72,6 @@ You need to have at least one chat log set to show `Own Gathering Messages` You 
 
 You must have the `Hide Chat Log (for privacy)` option disabled.
 
-- Supported language
-Korean is not supported at this time.
 You will need to restart ACT after you change parser language.
 
 ## Places To Get Help

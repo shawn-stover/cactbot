@@ -39,9 +39,13 @@ def load_timeline(timeline):
             if not sync_match:
                 continue
 
-            entry["regex"] = sync_match.group(1).replace(":", "\|")
             entry["branch"] = 0
 
+            ability_match = e_tools.is_tl_line_cast(sync_match.group(1))
+            if ability_match:
+                entry["regex"] = "2[12]\|[^\|]*\|........\|{}\|{}\|".format(
+                    ability_match.group("source"), ability_match.group("id")
+                )
             # Special casing on syncs
             entry["special_type"] = False
 
@@ -49,28 +53,53 @@ def load_timeline(timeline):
             if begincast_match:
                 entry["special_type"] = "begincast"
                 entry["special_line"] = "20"
-                entry["cast_id"] = begincast_match.group(1)
-                entry["caster_name"] = begincast_match.group(2)
+                entry["cast_id"] = begincast_match.group("id")
+                entry["caster_name"] = begincast_match.group("source")
+                entry["regex"] = "20\|[^\|]*\|........\|{}\|{}\|".format(
+                    begincast_match.group("source"), begincast_match.group("id")
+                )
 
             buff_match = e_tools.is_tl_line_buff(sync_match.group(1))
             if buff_match:
                 entry["special_type"] = "applydebuff"
                 entry["special_line"] = "26"
-                entry["buff_target"] = buff_match.group(1)
-                entry["buff_name"] = buff_match.group(2)
+                entry["buff_target"] = buff_match.group("target")
+                entry["buff_name"] = buff_match.group("effect")
+                entry["regex"] = "26\|[^\|]*\|{}\|{}\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|{}\|".format(
+                    buff_match.group("effectId"),
+                    buff_match.group("effect"),
+                    buff_match.group("target"),
+                )
 
             log_match = e_tools.is_tl_line_log(sync_match.group(1))
             if log_match:
                 entry["special_type"] = "battlelog"
                 entry["special_line"] = "00"
-                entry["logid"] = log_match.group(1)
-                entry["line"] = log_match.group(2)
+                entry["logid"] = log_match.group("id")
+                entry["line"] = log_match.group("message")
+                entry["regex"] = "00\|[^\|]*\|{}\|{}\|{}".format(
+                    log_match.group("id"), log_match.group("entity"), log_match.group("message")
+                )
 
             add_match = e_tools.is_tl_line_adds(sync_match.group(1))
             if add_match:
                 entry["special_type"] = "addlog"
                 entry["special_line"] = "03"
-                entry["name"] = add_match.group(1)
+                entry["name"] = add_match.group("entity")
+                entry["regex"] = "03\|[^\|]*\|........\|{}".format(add_match.group("entity"))
+
+            headmarker_match = e_tools.is_tl_line_headmarker(sync_match.group(1))
+            if headmarker_match:
+                entry["special_type"] = "headmarker"
+                entry["special_line"] = "27"
+                entry["headmarker_target"] = headmarker_match.group("target")
+                entry["regex"] = "27\|[^\|]*\|........\|{}\|....\|....\|{}".format(
+                    headmarker_match.group("target"), headmarker_match.group("id")
+                )
+
+            # If we're here and we're missing a regex type, just hope for the best
+            if "regex" not in entry:
+                entry["regex"] = sync_match.group(1).replace(":", "\|")
 
             # Get the start and end of the sync window
             window_match = re.search(r"window ([\d\.]+),?([\d\.]+)?", match.group("options"))
@@ -87,7 +116,6 @@ def load_timeline(timeline):
 
             entry["start"] = max(0, entry["time"] - pre_window)
             entry["end"] = entry["time"] + post_window
-
             # Get the jump time, if any
             jump_match = re.search(r"jump ([\d\.]+)", match.group("options"))
 
@@ -188,6 +216,8 @@ def get_type(event):
             return "battlelog"
         elif event.startswith("03"):
             return "addlog"
+        elif event.startswith("27"):
+            return "headmarker"
         else:
             return "none"
 
@@ -212,9 +242,7 @@ def test_match(event, entry):
     if isinstance(event, str) and entry["special_type"]:
         # Begincast case
         if entry["special_type"] == "begincast" and event.startswith(entry["special_line"]):
-            begincast_match = re.search(
-                "\|{}\|{}\|".format(entry["caster_name"], entry["cast_id"]), event
-            )
+            begincast_match = re.search(entry["regex"], event)
             if begincast_match:
                 return True
             else:
@@ -224,9 +252,7 @@ def test_match(event, entry):
         elif entry["special_type"] == "applydebuff" and event.startswith(entry["special_line"]):
             # Matching this format generically:
             # |Dadaluma Simulation|0.00|E0000000||4000AE96|Guardian
-            buff_match = re.search(
-                "\|{}\|([^\|]*\|){{4}}{}".format(entry["buff_name"], entry["buff_target"]), event
-            )
+            buff_match = re.search(entry["regex"], event, re.IGNORECASE)
             if buff_match:
                 return True
             else:
@@ -237,7 +263,7 @@ def test_match(event, entry):
             # Matching this format generically:
             # 00|2019-01-12T18:08:14.0000000-05:00|0839||The Realm of the Machinists will be sealed off in 15 seconds!|
             log_match = re.search(
-                "^00\|[^\|]*\|{}\|[^\|]*\|{}".format(entry["logid"], entry["line"]),
+                entry["regex"],
                 event,
                 re.IGNORECASE,
             )
@@ -250,8 +276,19 @@ def test_match(event, entry):
         elif entry["special_type"] == "addlog" and event.startswith(entry["special_line"]):
             # Matching this format generically:
             # 03|2019-01-12T18:07:46.6390000-05:00|40002269|Mustadio|0|46|dfa2|2ee0|0|0||dc029b852788abdd6056147620d2193c
-            add_match = re.search("^03\|[^\|]*\|[^\|]*\|{}\|".format(entry["name"]), event)
+            add_match = re.search(entry["regex"], event)
             if add_match:
+                return True
+            else:
+                return False
+
+        # Head marker case
+        elif entry["special_type"] == "headmarker" and event.startswith(entry["special_line"]):
+            marker_match = re.search(
+                entry["regex"],
+                event,
+            )
+            if marker_match:
                 return True
             else:
                 return False
@@ -312,11 +349,15 @@ def check_event(event, timelist, state):
 
             # Check the timeline drift for anomolous timings
             drift = entry["time"] - timeline_position
-            print(
-                "{:.3f}: Matched entry: {} {} ({:+.3f}s)".format(
-                    timeline_position, entry["time"], entry["label"], drift
-                )
+            entry_text = "{:.3f}: Matched entry: {} {} ({:+.3f}s)".format(
+                timeline_position, entry["time"], entry["label"], drift
             )
+            if args.drift_max > abs(drift) > args.drift_failure:
+                print(e_tools.color_fail(entry_text))
+            elif args.drift_failure > abs(drift) > args.drift_warning:
+                print(e_tools.color_warn(entry_text))
+            else:
+                print(entry_text)
 
             if time_progress_seconds > 30:
                 print("    Warning: {:.3f}s since last sync".format(time_progress_seconds))
@@ -389,11 +430,8 @@ def run_file(args, timelist):
         if args.search_fights:
             encounter_sets = e_tools.find_fights_in_file(file)
             # If all we want to do is list encounters, stop here and give to the user.
-            if args.search_fights == -1:
-                return [f'{i + 1}. {" ".join(e_info)}' for i, e_info in enumerate(encounter_sets)]
-            elif args.search_fights > len(encounter_sets) or args.search_fights < -1:
-                raise Exception("Selected fight index not in selected ACT log.")
-
+            if args.search_fights < 0:
+                return e_tools.list_fights_in_file(args, encounter_sets)
         start_time, end_time = e_tools.choose_fight_times(args, encounter_sets)
         # Scan the file until the start timestamp
         for line in file:
@@ -539,23 +577,49 @@ if __name__ == "__main__":
         help="The filename of the timeline to test against, e.g. ultima_weapon_ultimate",
     )
 
+    # Output Format arguments
+    parser.add_argument(
+        "-df",
+        "--drift-failure",
+        nargs="?",
+        default=1,
+        type=float,
+        help="If an entry misses its timestamp by more than this value in seconds, it is displayed in red. Defaults to 1.",
+    )
+    parser.add_argument(
+        "-dw",
+        "--drift-warning",
+        nargs="?",
+        default=0.2,
+        type=float,
+        help="If an entry misses its timestamp by more than this value in seconds, it is displayed in yellow. Defaults to 0.2.",
+    )
+    parser.add_argument(
+        "-dm",
+        "--drift-max",
+        nargs="?",
+        default=10,
+        type=float,
+        help="If an entry misses its timestamp by more than this value in seconds, it is assumed to be a jump and will not be highlighted. Defaults to 10.",
+    )
+
     args = parser.parse_args()
 
     # Check dependent args
     if args.search_fights and not args.file:
-        raise parser.error("Automatic encounter listing requires an input file")
+        parser.error("Automatic encounter listing requires an input file")
 
     if args.search_fights and args.search_fights > -1 and not args.timeline:
-        raise parser.error(
+        parser.error(
             "You must specify a timeline file before testing against a specific encounter."
         )
 
     if args.file and not ((args.start and args.end) or args.search_fights):
-        raise parser.error("Log file input requires start and end timestamps")
+        parser.error("Log file input requires start and end timestamps")
 
     if args.report and not args.key:
-        raise parser.error(
-            "FFlogs parsing requires an API key. Visit https://www.fflogs.com/profile and use the Public key"
+        parser.error(
+            "FFlogs parsing requires an API key. Visit https://www.fflogs.com/profile and use the V1 Client Key"
         )
 
     # Actually call the script

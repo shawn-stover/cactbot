@@ -6,7 +6,7 @@ import csv
 import csv_util
 import os
 
-_OUTPUT_FILE = "hunt.js"
+_OUTPUT_FILE = "hunt.ts"
 
 
 def update_german(list, search, replace):
@@ -50,9 +50,9 @@ def parse_data(monsters, notorious, lang, name_map):
         # Other dumps just have the int.
         base = base.replace("BNpcBase#", "")
 
-        if base == "10422":
+        if base in ["10422", "13775"]:
             rank = "SS+"
-        elif base == "10755":
+        elif base in ["10755", "13938"]:
             rank = "SS-"
         elif rank_id == "3":
             rank = "S"
@@ -102,11 +102,33 @@ def get_from_coinach(_ffxiv_game_path, _saint_conainch_cmd_path, _cactbot_path):
         all_monsters[info["name"]["en"]] = info
 
     writer = coinach.CoinachWriter(cactbot_path=_cactbot_path)
-    writer.write(
-        os.path.join("resources", _OUTPUT_FILE),
-        os.path.basename(os.path.abspath(__file__)),
-        "gMonster",
-        all_monsters,
+
+    header = """import { LocaleObject } from '../types/trigger';
+
+type LocaleTextOrArray = LocaleObject<string | string[]>;
+
+export type Rank = 'S' | 'SS+' | 'SS-' | 'A' | 'B';
+
+// Optional values are supported in `Options.CustomMonsters`.
+export type HuntEntry = {
+  id: string;
+  name: LocaleTextOrArray | string | string[];
+  rank?: Rank;
+  regex?: RegExp;
+  hp?: number;
+};
+
+export type HuntMap = {
+  [huntName: string]: HuntEntry;
+};"""
+
+    writer.writeTypeScript(
+        filename=os.path.join("resources", _OUTPUT_FILE),
+        scriptname=os.path.basename(os.path.abspath(__file__)),
+        header=header,
+        type="HuntMap",
+        as_const=False,
+        data=all_monsters,
     )
 
     print(f"File '{_OUTPUT_FILE}' successfully created.")

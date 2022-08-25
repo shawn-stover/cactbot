@@ -4,8 +4,13 @@
 
 ## File Structure
 
+Each trigger file is a module that exports a single trigger set.
+
 ```javascript
-[{
+import ZoneId from '../path/to/resources/zone_id';
+// Other imports here.
+
+export default {
   zoneId: ZoneId.TheWeaponsRefrainUltimate,
   overrideTimelineFile: false,
   timelineFile: 'filename.txt',
@@ -27,29 +32,29 @@
     { /* ..trigger 2.. */ },
     { /* ..trigger 3.. */ },
   ]
-},
-{
-  zoneRegex: /Eureka Hydatos/,
-  triggers: [
-    { /* ..trigger 1.. */ },
-    { /* ..trigger 2.. */ },
-    { /* ..trigger 3.. */ },
-  ]
-}]
+};
 ```
 
-### Elements
+### Trigger Set Properties
 
 **zoneId**
 A shortened name for the zone to use these triggers in.
-The set of id names can be found in [zone_id.js](../resources/zone_id.js).
+The set of id names can be found in [zone_id.ts](../resources/zone_id.ts).
 Prefer using this over zoneRegex.
 A trigger set must have one of zoneId or zoneRegex to specify the zone
 (but not both).
 
+**initData**
+A function that can be used to initialize the data this trigger set uses.
+It should return an object that sets values for any fields in `data` that need to be initialized.
+This function is called any time the fight is reset, mainly on zone change or wipe.
+See [t1.ts](../ui/raidboss/data/02-arr/raid/t1.ts) for an example implementation.
+
 **zoneRegex**
 A regular expression that matches against the zone name (coming from ACT).
 If the regular expression matches, then the triggers will apply to that zone.
+
+For players in CN/KR, zone names can be Chinese/Korean, though other players always see English. Your Regex should cover them. The current zone name can be found on title or main UI of ACT.
 
 **overrideTimelineFile**
 An optional boolean value that specifies that the `timelineFile` and `timeline`
@@ -57,10 +62,18 @@ specified in this trigger set override all timelines previously found.
 This is a way to replace timelines in user files and is not used inside cactbot itself.
 
 **timelineFile**
-An optional timeline file to load for this zone. These files live alongside their parent trigger file in the appropriate folder. (As for example `raidboss/data/04-sb/raid/`).
+An optional timeline file to load for this zone.
+Timeline files in cactbot should be named the same as the `.js` file they come from,
+but with a `.txt` extension instead.
+These files live alongside their parent trigger file in the appropriate folder. (As for example `raidboss/data/04-sb/raid/`).
 
 **timeline**
 Optional extra lines to include as part of the timeline.
+The value may be a string or an array of strings,
+or a `function(data)` that returns string or an array of strings,
+or an array contains different kinds of items above.
+
+There is a complete example that uses the **timeline** property in [test.js](../ui/raidboss/data/00-misc/test.js).
 
 **locale**
 Optional locale to restrict the trigger file to, e.g. 'en', 'ko', 'fr'. If not present, applies to all locales.
@@ -79,12 +92,13 @@ Boolean, defaults to true. If true, timelines and triggers will reset automatica
 ```javascript
 {
   id: 'id string',
+  // Note: netRegex only, see `NetFields` from [net_fields.d.ts](https://github.com/quisquous/cactbot/blob/main/types/net_fields.d.ts)
+  type: 'StartsUsing',
   disabled: false,
-  // Note: prefer to use the regex helpers from [regexes.js](https://github.com/quisquous/cactbot/blob/main/resources/regexes.js)
-  netRegex: /trigger-regex-for-network-log-lines/,
-  netRegexFr: /trigger-regex-for-network-log-lines-but-in-French/
+  // Note: use the regex helpers from [netregexes.ts](https://github.com/quisquous/cactbot/blob/main/resources/netregexes.ts)
+  netRegex: NetRegexes.startsUsing({ id: 'some-id', source: 'some-name' }),
+  // Note: prefer to use the regex helpers from [regexes.ts](https://github.com/quisquous/cactbot/blob/main/resources/regexes.ts)
   regex: /trigger-regex-for-act-log-lines/,
-  regexFr: /trigger-regex-for-act-log-lines-but-in-French/,
   condition: function(data, matches, output) { return true if it should run },
   preRun: function(data, matches, output) { do stuff.. },
   delaySeconds: 0,
@@ -122,7 +136,7 @@ For such functions:
   for triggers that don't output anything, e.g. `preRun` or `run`,
   the output field is largely meaningless.
 
-### Trigger Elements
+### Trigger Properties
 
 **id string**
  An id string for the trigger.
@@ -150,51 +164,38 @@ Defaults to false.
 The regular expression cactbot will run against each log line
 to determine whether the trigger will activate.
 The `netRegex` version matches against network log lines,
-while the `regex` version matches against regular ACT log lines.
+while the `regex` version matches against parsed ACT log lines.
 
 More commonly, however, a regex replacement is used instead of a bare regex.
-Helper functions defined in [regexes.js](https://github.com/quisquous/cactbot/blob/main/resources/regexes.js)
-and in [netregexes.js](https://github.com/quisquous/cactbot/blob/main/resources/netregexes.js)
+Helper functions defined in [regexes.ts](https://github.com/quisquous/cactbot/blob/main/resources/regexes.ts)
+and in [netregexes.ts](https://github.com/quisquous/cactbot/blob/main/resources/netregexes.ts)
 take the parameters that would otherwise be extracted via match groups.
 From here, the functions automatically construct the regex that should
 be matched against.
 Unsurprisingly, for `netRegex` use the `NetRegexes` helper
 and for `regex` use the `Regexes` helper.
 
-**netRegexFr / regexFr**
-Example of a locale-based regular expression for the 'fr' locale.
-If `Options.ParserLanguage == 'fr'`, then `regexFr` (if it exists) takes precedence over `regex`.
-Otherwise, it is ignored.  This is only an example for french, but other locales behave the same, e.g. regexEn, regexKo.
-Like `netRegex` vs `regex`,
-`netRegexFr` matches against network log lines in French
-while `regexFr` matches against ACT log lines in French.
-
-Locale regexes do not have a defined ordering.
-Current practice is to order them as `de`, `fr`, `ja`, `cn`, `ko`, however.
-Additionally, as with bare `regex` elements, current practice is to use regex replacements instead.
-
-(Ideally, at some point in the future, we could get to the point where we don't need individual locale regexes.
-Instead, we could use the translations provided in the `timelineReplace` object to do this automagically.
-We're not there yet, but there's always someday.)
+`regex` and `netRegex` lines are auto-translated using the `timelineReplace` section.
 
 **condition: function(data, matches, output)**
 Activates the trigger if the function returns `true`.
 If it does not return `true`, nothing is shown/sounded/run.
 If multiple functions are present on the trigger, this has first priority to run.
-(Pre-made "canned" conditions are available within [conditions.js](https://github.com/quisquous/cactbot/blob/main/resources/conditions.js).
+(Pre-made "canned" conditions are available within [conditions.ts](https://github.com/quisquous/cactbot/blob/main/resources/conditions.ts).
 Generally speaking it's best to use one of these if it fits the situation.)
 
 **preRun: function(data, matches, output)**
 If the trigger activates, the function will run as the first action after the activation condition is met.
 
-**promise: function(data, matches, output)**
-If present and a function which returns a promise,
-will wait for promise to resolve before continuing with trigger.
-This runs after `preRun` and before the `delaySeconds` delay.
-
 **delaySeconds**
 An amount of time, in seconds, to wait from the time the regex match is detected until the trigger activates.
 May be a number or a `function(data, matches, output)` that returns a number.
+This runs after `preRun` and before the `promise`.
+
+**promise: function(data, matches, output)**
+If present and a function which returns a promise,
+will wait for promise to resolve before continuing with trigger.
+This runs after the delay from `delaySeconds`.
 
 **durationSeconds**
 Time, in seconds, to display the trigger text.
@@ -217,10 +218,10 @@ Volume between 0 and 1 to play the sound associated with the trigger.
 
 **response**
 A way to return infoText/alertText/alarmText/tts all from a single entrypoint.
-Also used by `resources/responses.js`.
+Also used by `resources/responses.ts`.
 Response has less priority than an explicitly specified text or tts,
 and so can be overridden.
-(As with `regex` and `condition`, "canned" responses are available within [responses.js](https://github.com/quisquous/cactbot/blob/main/resources/responses.js).)
+(As with `regex` and `condition`, "canned" responses are available within [responses.ts](https://github.com/quisquous/cactbot/blob/main/resources/responses.ts).)
 
 **alarmText**
 Displays a text popup with Alarm importance when the trigger activates.
@@ -246,8 +247,29 @@ May be a string or a `function(data, matches, output)` that returns a string.
 **tts**
 An alternative text string for the chosen TTS option to use for callouts.
 This can be a localized object just like the text popups.
+If this is set, but there is no key matching your current language,
+Raidboss will default to the text from the text popups.
 
-**run: function(data, matches, ouptut)**
+For example, consider this configuration:
+
+```typescript
+{
+  ...
+  infoText: {
+    en: 'Tank Buster',
+    de: 'AoE',
+    fr: 'Cleave',
+  },
+  tts: {
+    de: 'Spread',
+  },
+}
+```
+
+If your language is `en`, you will receive the `Tank Buster` message.
+If your language is `de`, you will receive the `Spread` message.
+
+**run: function(data, matches, output)**
 If the trigger activates, the function will run as the last action before the trigger ends.
 
 **outputStrings**
@@ -312,7 +334,7 @@ and instead `response` should return a function that calls
 `output.responseOutputStrings = {};`
 where `{}` is the outputStrings object you would have returned from the trigger `outputStrings` field.
 This is a bit awkward, but allows response to both return and use `outputStrings`,
-and keeps [resources/responses.js](../resources/responses.js) more encapsulated.
+and keeps [resources/responses.ts](../resources/responses.ts) more encapsulated.
 
 For example:
 
@@ -338,8 +360,8 @@ Trigger elements are evaluated in this order, and must be listed in this order:
 
 - id
 - disabled
-- netRegex (and netRegexDe, netRegexFr, etc)
-- regex (and regexDe, regexFr, etc)
+- netRegex
+- regex
 - beforeSeconds (for timelineTriggers)
 - (suppressed triggers early out here)
 - condition
@@ -356,7 +378,6 @@ Trigger elements are evaluated in this order, and must be listed in this order:
 - alarmText
 - alertText
 - infoText
-- groupTTS
 - tts
 - run
 - outputStrings
@@ -386,41 +407,31 @@ Use of these helpers makes automated testing significantly easier,
 and allows humans to catch errors and inconsistencies more easily when reviewing pull requests.
 
 Currently, three separate elements have pre-made structures defined:
-[Condition](https://github.com/quisquous/cactbot/blob/main/resources/conditions.js), [Regex](https://github.com/quisquous/cactbot/blob/main/resources/regexes.js), and [Response](https://github.com/quisquous/cactbot/blob/main/resources/responses.js).
+[Condition](https://github.com/quisquous/cactbot/blob/main/resources/conditions.ts), [Regex](https://github.com/quisquous/cactbot/blob/main/resources/regexes.ts), [NetRegex](https://github.com/quisquous/cactbot/blob/main/resources/netregexes.ts), and [Response](https://github.com/quisquous/cactbot/blob/main/resources/responses.ts).
 `Condition` functions take no arguments. Almost all `Response` functions take one optional argument, `severity`,
 used to determine what level of popup text to display to the user when the trigger activates.
-`Regex` functions can take several arguments [(`gainsEffect()` is a good example)](https://github.com/quisquous/cactbot/blob/dcdf3ee4cd1b6d5bdfb9a8052cc9e4c9b10844d8/resources/regexes.js#L176) depending on which log line is being matched against,
+`Regex`(`NetRegex`) functions can take several arguments [(`gainsEffect()` is a good example)](https://github.com/quisquous/cactbot/blob/0bd9095682ec15b35f880d2241be365f4bdf6a87/resources/regexes.ts#L348) depending on which log line is being matched against,
 but generally a contributor would include the `source`, (name of the caster/user of the ability to match,)
 the `id`, (the hex ability ID, such as `2478`,) and whether or not the regex should capture the matches (`capture: false`.)
-`Regex` functions capture by default, but standard practice is to specify non-capturing unless a trigger element requires captures.
+`Regex`(`NetRegex`) functions capture by default, but standard practice is to specify non-capturing unless a trigger element requires captures.
 
 A sample trigger that makes use of all these elements:
 
 ```javascript
 {
   id: 'TEA Mega Holy Modified',
-  regex: Regexes.startsUsing({ source: 'Alexander Prime', id: '4A83', capture: false }),
-  regexDe: Regexes.startsUsing({ source: 'Prim-Alexander', id: '4A83', capture: false }),
-  regexFr: Regexes.startsUsing({ source: 'Primo-Alexander', id: '4A83', capture: false }),
-  regexJa: Regexes.startsUsing({ source: 'アレキサンダー・プライム', id: '4A83', capture: false }),
-  regexCn: Regexes.startsUsing({ source: '至尊亚历山大', id: '4A83', capture: false }),
-  regexKo: Regexes.startsUsing({ source: '알렉산더 프라임', id: '4A83', capture: false }),
+  netRegex: NetRegexes.startsUsing({ source: 'Alexander Prime', id: '4A83', capture: false }),
   condition: Conditions.caresAboutMagical(),
   response: Responses.bigAoe('alert'),
 },
 ```
 
-While this doesn't reduce the number of lines we need to match the locale regexes, this is far less verbose than:
+This is far less verbose than:
 
 ```javascript
 {
   id: 'TEA Mega Holy Modified',
-  regex:  / 14:........:Alexander Prime starts using Mega Holy/,
-  regexDe: / 14:........:Prim-Alexander starts using Super-Sanctus/,
-  regexFr: / 14:........:Primo-Alexander starts using Méga Miracle/,
-  regexJa: / 14:........:アレキサンダー・プライム starts using メガホーリー/,
-  regexCn: / 14:........:至尊亚历山大 starts using 百万神圣/,
-  regexKo: / 14:........:알렉산더 프라임 starts using 지진/,
+  netRegex: /^(?:20)\|(?:[^|]*)\|(?:[^|]*)\|(?:Alexander Prime)\|(?:4A83)\|/i,
   condition: function(data) {
     return data.role == 'tank' || data.role == 'healer' || data.CanAddle();
   },
@@ -438,13 +449,56 @@ While this doesn't reduce the number of lines we need to match the locale regexe
 Use of bare regexes is deprecated. *Always* use the appropriate canned function unless there is a very specific
 reason not to. Attempting to use a bare regex will cause a build failure when the pull request is submitted.
 If a bare regex must be used for whatever reason (if, say, a new log line is added to ACT,)
-pull requests to update `regexes.js` are strongly encouraged.
+pull requests to update `regexes.ts` are strongly encouraged.
 
 (Note that if you are writing triggers for just your personal use, you are free to do what you want.
 This deprecation applies only to work intended for the cactbot repository.)
 
 Use of canned conditions and responses is recommended where possible, although
 given Square's extremely talented fight design team, it's not always going to *be* possible.
+
+## Outputs
+
+In order to reduce duplications across trigger sets,
+cactbot has a set of locale strings that includes text repeatedly used by triggers.
+When writing triggers, prefer using `Outputs` if possible to avoid duplication.
+
+A simple example using `outputStrings` and `Outputs` as below:
+
+```javascript
+{
+  id: 'E9S Zero-Form Devouring Dark',
+  netRegex: NetRegexes.startsUsing({ id: '5623', source: 'Cloud Of Darkness' }),
+  durationSeconds: 4,
+  alertText: function(data, matches, output) {
+    if (data.me === matches.target)
+      return output.tankBusterOnYou();
+
+    if (data.role === 'tank')
+      return output.tankSwap();
+
+    if (data.role === 'healer')
+      return output.tankBusters({ player: data.ShortName(matches.target) });
+  },
+  infoText: function(data, _matches, output) {
+    if (data.role !== 'tank' && data.role !== 'healer')
+      return output.avoidLaser();
+  },
+  outputStrings: {
+    tankBusterOnYou: Outputs.tankBusterOnYou,
+    tankBusters: Outputs.tankBusters,
+    tankSwap: Outputs.tankSwap,
+    avoidLaser: {
+      en: 'Avoid Laser',
+      de: 'Laser ausweichen',
+      fr: 'Évitez le laser',
+      ja: 'レーザー注意',
+      cn: '躲避击退激光',
+      ko: '레이저 피하기',
+    },
+  },
+},
+```
 
 ## Timeline Info
 

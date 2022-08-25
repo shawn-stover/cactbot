@@ -2,6 +2,8 @@
 using RainbowMage.OverlayPlugin.Updater;
 using System;
 using System.IO;
+using CactbotEventSource.loc;
+using System.Reflection;
 
 namespace Cactbot {
 
@@ -96,15 +98,41 @@ namespace Cactbot {
       return System.Reflection.Assembly.GetAssembly(typeof(Advanced_Combat_Tracker.ActGlobals)).Location;
     }
 
+    public enum GameRegion {
+      International,
+      Chinese,
+      Korean,
+    }
+
+    public GameRegion GetGameRegion() {
+      try {
+        var mach = Assembly.Load("Machina.FFXIV");
+        var opcode_manager_type = mach.GetType("Machina.FFXIV.Headers.Opcodes.OpcodeManager");
+        var opcode_manager = opcode_manager_type.GetProperty("Instance").GetValue(null);
+        var machina_region = opcode_manager_type.GetProperty("GameRegion").GetValue(opcode_manager).ToString();
+        switch (machina_region) {
+          case "Chinese":
+            return GameRegion.Chinese;
+          case "Korean":
+            return GameRegion.Korean;
+          default:
+            return GameRegion.International;
+        }
+      } catch (Exception e) {
+        logger_.Log(LogLevel.Error, Strings.GetGameRegionException, e.Message);
+        return GameRegion.International;
+      }
+    }
+
     public async void DoUpdateCheck(CactbotEventSourceConfig config) {
       var pluginDirectory = GetCactbotDirectory();
       if (pluginDirectory == "") {
-        logger_.LogError("Unable to auto-update due to unknown cactbot directory");
+        logger_.Log(LogLevel.Error, Strings.UnableUpdateDueToUnknownDirectoryErrorMessage);
         return;
       }
 
       if (Directory.Exists(Path.Combine(pluginDirectory, ".git"))) {
-        logger_.LogInfo("Ignoring auto-update due to cactbot directory being a .git repo.");
+        logger_.Log(LogLevel.Info, Strings.IgnoreUpdateDueToDotGitDirectoryMessage);
         return;
       }
 
