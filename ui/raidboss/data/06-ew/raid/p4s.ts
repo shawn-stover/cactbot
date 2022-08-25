@@ -109,11 +109,7 @@ const curtainCallOutputStrings = {
 const eviscerationMarker = parseInt('00DA', 16);
 const orangeMarker = parseInt('012F', 16);
 
-const getHeadmarkerId = (
-  data: Data,
-  matches: NetMatches['HeadMarker'],
-  firstDecimalMarker: number
-) => {
+const getHeadmarkerId = (data: Data, matches: NetMatches['HeadMarker'], firstDecimalMarker: number) => {
   // If we naively just check !data.decOffset and leave it, it breaks if the first marker is 00DA.
   // (This makes the offset 0, and !0 is true.)
   if (typeof data.decOffset === 'undefined')
@@ -121,10 +117,7 @@ const getHeadmarkerId = (
   // The leading zeroes are stripped when converting back to string, so we re-add them here.
   // Fortunately, we don't have to worry about whether or not this is robust,
   // since we know all the IDs that will be present in the encounter.
-  return (parseInt(matches.id, 16) - data.decOffset)
-    .toString(16)
-    .toUpperCase()
-    .padStart(4, '0');
+  return (parseInt(matches.id, 16) - data.decOffset).toString(16).toUpperCase().padStart(4, '0');
 };
 
 const triggerSet: TriggerSet<Data> = {
@@ -145,7 +138,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Stack for Puddle AOEs',
           de: 'Stacken (Pfützen)',
-          fr: "Packez les zones au sol d'AoEs",
+          fr: 'Packez les zones au sol d\'AoEs',
           ja: 'AoEを誘導',
           cn: '集合放置AOE',
           ko: '모여서 장판 한곳에 깔기',
@@ -162,16 +155,17 @@ const triggerSet: TriggerSet<Data> = {
           jumpDir = !data.kickTwo ? output.west!() : output.east!();
         else if (data.jumpDir1 === 'west')
           jumpDir = !data.kickTwo ? output.east!() : output.west!();
-        else return output.baitJump!();
+        else
+          return output.baitJump!();
 
         return output.baitJumpDir!({ dir: jumpDir });
       },
-      run: (data) => (data.kickTwo = true),
+      run: (data) => data.kickTwo = true,
       outputStrings: {
         baitJumpDir: {
           en: 'Bait Jump ${dir}?',
           de: 'Sprung ködern ${dir}?',
-          fr: "Attirez le saut à l'${dir}?",
+          fr: 'Attirez le saut à l\'${dir}?',
           ja: 'ジャンプ誘導?: ${dir}',
           cn: '引导跳跃 ${dir}?',
           ko: '점프 유도?: ${dir}',
@@ -206,7 +200,7 @@ const triggerSet: TriggerSet<Data> = {
       },
     },
     {
-      id: "P4S Hemitheos's Water IV",
+      id: 'P4S Hemitheos\'s Water IV',
       regex: /Hemitheos's Water IV/,
       beforeSeconds: 5,
       alertText: (_data, _matches, output) => output.text!(),
@@ -238,24 +232,15 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Decollation',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '6A09',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '6A09', source: 'Hesperos', capture: false }),
       response: Responses.aoe(),
     },
     {
       id: 'P4S Bloodrake',
       // AoE hits tethered players in first one, the non-tethered in second
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '69D8',
-        source: 'Hesperos',
-        capture: false,
-      }),
-      preRun: (data) =>
-        (data.bloodrakeCounter = (data.bloodrakeCounter ?? 0) + 1),
+      netRegex: NetRegexes.startsUsing({ id: '69D8', source: 'Hesperos', capture: false }),
+      preRun: (data) => data.bloodrakeCounter = (data.bloodrakeCounter ?? 0) + 1,
       response: Responses.aoe(),
     },
     {
@@ -266,16 +251,12 @@ const triggerSet: TriggerSet<Data> = {
       suppressSeconds: 1,
       infoText: (data, matches, output) => {
         const roles: { [role: string]: string } = {
-          dps: output.dps!(),
+          'dps': output.dps!(),
           'tank/healer': output.tankHealer!(),
         };
 
-        const roleRaked = data.party.isDPS(matches.target)
-          ? 'dps'
-          : 'tank/healer';
-        const roleOther = data.party.isDPS(matches.target)
-          ? 'tank/healer'
-          : 'dps';
+        const roleRaked = data.party.isDPS(matches.target) ? 'dps' : 'tank/healer';
+        const roleOther = data.party.isDPS(matches.target) ? 'tank/healer' : 'dps';
 
         // Second bloodrake = Debuffs later
         if ((data.bloodrakeCounter ?? 0) === 2) {
@@ -287,8 +268,8 @@ const triggerSet: TriggerSet<Data> = {
           }
 
           // May end up needing both tether and debuff
-          const tetherRole = (data.tetherRole ??= []);
-          const debuffRole = (data.debuffRole ??= []);
+          const tetherRole = data.tetherRole ??= [];
+          const debuffRole = data.debuffRole ??= [];
           if (tetherRole[0] === debuffRole[0])
             return output.roleEverything!({ role: roles[roleOther] });
           return output.roleDebuffs!({ role: roles[roleOther] });
@@ -310,10 +291,7 @@ const triggerSet: TriggerSet<Data> = {
       // 69DE is No Tank/Healer Belone Coils
       // 69DF is No DPS Belone Coils
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: ['69DE', '69DF', '69E0', '69E1'],
-        source: 'Hesperos',
-      }),
+      netRegex: NetRegexes.startsUsing({ id: ['69DE', '69DF', '69E0', '69E1'], source: 'Hesperos' }),
       preRun: (data) => {
         if (!data.beloneCoilsTwo) {
           delete data.debuffRole;
@@ -330,7 +308,7 @@ const triggerSet: TriggerSet<Data> = {
         output.responseOutputStrings = roleOutputStrings;
 
         const roles: { [role: string]: string } = {
-          dps: output.dps!(),
+          'dps': output.dps!(),
           'tank/healer': output.tankHealer!(),
         };
 
@@ -348,20 +326,14 @@ const triggerSet: TriggerSet<Data> = {
 
           // For second coils, if you are not in the debuff list here you are tower
           if (!data.debuffRole.includes(data.role))
-            return {
-              ['alertText']: output.roleTowers!({ role: roles[roleTowers] }),
-            };
+            return { ['alertText']: output.roleTowers!({ role: roles[roleTowers] }) };
 
           // If you have tethers and debuff, you need everything
-          const tetherRole = (data.tetherRole ??= []);
-          const debuffRole = (data.debuffRole ??= []);
+          const tetherRole = data.tetherRole ??= [];
+          const debuffRole = data.debuffRole ??= [];
           if (debuffRole[0] === tetherRole[0])
-            return {
-              ['infoText']: output.roleEverything!({ role: roles[roleOther] }),
-            };
-          return {
-            ['infoText']: output.roleDebuffs!({ role: roles[roleOther] }),
-          };
+            return { ['infoText']: output.roleEverything!({ role: roles[roleOther] }) };
+          return { ['infoText']: output.roleDebuffs!({ role: roles[roleOther] }) };
         }
 
         // First Coils = Tethers later
@@ -374,33 +346,28 @@ const triggerSet: TriggerSet<Data> = {
 
         // For first coils, there are tower and tethers
         if (data.tetherRole.includes(data.role))
-          return {
-            ['alertText']: output.roleTethers!({ role: roles[roleOther] }),
-          };
-        return {
-          ['alertText']: output.roleTowers!({ role: roles[roleTowers] }),
-        };
+          return { ['alertText']: output.roleTethers!({ role: roles[roleOther] }) };
+        return { ['alertText']: output.roleTowers!({ role: roles[roleTowers] }) };
       },
-      run: (data) => (data.beloneCoilsTwo = true),
+      run: (data) => data.beloneCoilsTwo = true,
     },
     {
       id: 'P4S Role Call',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({
-        effectId: ['AF2', 'AF3'],
-        capture: true,
-      }),
+      netRegex: NetRegexes.gainsEffect({ effectId: ['AF2', 'AF3'], capture: true }),
       condition: Conditions.targetIsYou(),
       infoText: (data, matches, output) => {
         const debuffRole = (data.debuffRole ??= []).includes(data.role);
         if (matches.effectId === 'AF2') {
           // Call Pass Role Call if not in the debuff role
-          if (!debuffRole) return output.passRoleCall!();
+          if (!debuffRole)
+            return output.passRoleCall!();
           data.hasRoleCall = true;
         }
 
         // AF3 is obtained after passing Role Call (AF2)
-        if (matches.effectId === 'AF3') data.hasRoleCall = false;
+        if (matches.effectId === 'AF3')
+          data.hasRoleCall = false;
       },
       outputStrings: {
         passRoleCall: {
@@ -414,18 +381,15 @@ const triggerSet: TriggerSet<Data> = {
       },
     },
     {
-      id: "P4S Director's Belone",
+      id: 'P4S Director\'s Belone',
       type: 'Ability',
-      netRegex: NetRegexes.ability({
-        id: '69E6',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.ability({ id: '69E6', source: 'Hesperos', capture: false }),
       // Delay callout until debuffs are out
       delaySeconds: 1.4,
       alertText: (data, _matches, output) => {
         const debuffRole = (data.debuffRole ??= []).includes(data.role);
-        if (!data.hasRoleCall && debuffRole) return output.text!();
+        if (!data.hasRoleCall && debuffRole)
+          return output.text!();
       },
       outputStrings: {
         text: {
@@ -442,15 +406,12 @@ const triggerSet: TriggerSet<Data> = {
       id: 'P4S Inversive Chlamys',
       // Possible a player still has not yet passed debuff
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '69ED',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '69ED', source: 'Hesperos', capture: false }),
       condition: (data) => !data.ignoreChlamys,
       alertText: (data, _matches, output) => {
         const dps = (data.tetherRole ??= []).includes('dps');
-        if (dps) return output.roleTethers!({ role: output.dps!() });
+        if (dps)
+          return output.roleTethers!({ role: output.dps!() });
         if (data.tetherRole.length)
           return output.roleTethers!({ role: output.tankHealer!() });
         return output.roleTethers!({ role: output.unknown!() });
@@ -474,12 +435,8 @@ const triggerSet: TriggerSet<Data> = {
       id: 'P4S Levinstrike Pinax',
       // Strong proximity Aoe
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '69D7',
-        source: 'Hesperos',
-        capture: false,
-      }),
-      preRun: (data) => (data.pinaxCount = (data.pinaxCount ?? 0) + 1),
+      netRegex: NetRegexes.startsUsing({ id: '69D7', source: 'Hesperos', capture: false }),
+      preRun: (data) => data.pinaxCount = (data.pinaxCount ?? 0) + 1,
       durationSeconds: 6,
       alarmText: (_data, _matches, output) => output.text!(),
       outputStrings: {
@@ -496,14 +453,11 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Well Pinax',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '69D6',
-        source: 'Hesperos',
-        capture: false,
-      }),
-      preRun: (data) => (data.pinaxCount = (data.pinaxCount ?? 0) + 1),
+      netRegex: NetRegexes.startsUsing({ id: '69D6', source: 'Hesperos', capture: false }),
+      preRun: (data) => data.pinaxCount = (data.pinaxCount ?? 0) + 1,
       infoText: (data, _matches, output) => {
-        if ((data.pinaxCount ?? 0) % 2) return output.text!();
+        if ((data.pinaxCount ?? 0) % 2)
+          return output.text!();
         data.wellShiftKnockback = true;
         return output.shiftWell!();
       },
@@ -511,7 +465,7 @@ const triggerSet: TriggerSet<Data> = {
         text: {
           en: 'Well Pinax',
           de: 'Brunnen-Pinax',
-          fr: "Pinax d'eau",
+          fr: 'Pinax d\'eau',
           ja: '水',
           cn: '水',
           ko: '물',
@@ -532,10 +486,11 @@ const triggerSet: TriggerSet<Data> = {
       netRegex: NetRegexes.startsUsing({ id: '69D6', source: 'Hesperos' }),
       delaySeconds: (data, matches) => {
         // Delay for for Directional Shift on Even Well/Levinstrike Pinax Count
-        if ((data.pinaxCount ?? 0) % 2) return parseFloat(matches.castTime) - 5;
+        if ((data.pinaxCount ?? 0) % 2)
+          return parseFloat(matches.castTime) - 5;
         return parseFloat(matches.castTime) - 2.4;
       },
-      durationSeconds: (data) => (data.wellShiftKnockback ? 2.4 : 5),
+      durationSeconds: (data) => data.wellShiftKnockback ? 2.4 : 5,
       response: (data, _matches, output) => {
         // cactbot-builtin-response
         output.responseOutputStrings = {
@@ -558,21 +513,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Acid Pinax',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '69D4',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '69D4', source: 'Hesperos', capture: false }),
       response: Responses.spread('alert'),
     },
     {
       id: 'P4S Lava Pinax',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '69D5',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '69D5', source: 'Hesperos', capture: false }),
       infoText: (_data, _matches, output) => output.groups!(),
       outputStrings: {
         groups: {
@@ -588,11 +535,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Northerly Shift Slash',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '6A02',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '6A02', source: 'Hesperos', capture: false }),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -608,17 +551,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Easterly Shift Slash',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '6A04',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '6A04', source: 'Hesperos', capture: false }),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'East Cleave',
           de: 'Cleave -> Geh in den Osten',
-          fr: "Cleave à l'est",
+          fr: 'Cleave à l\'est',
           ja: '東の横',
           cn: '右 (东) 两侧',
           ko: '동쪽 칼 휘두르기',
@@ -628,11 +567,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Southerly Shift Slash',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '6A03',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '6A03', source: 'Hesperos', capture: false }),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -648,17 +583,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Westerly Shift Slash',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '6A05',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '6A05', source: 'Hesperos', capture: false }),
       alertText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'West Cleave',
           de: 'Cleave -> Geh in den Westen',
-          fr: "Cleave à l'ouest",
+          fr: 'Cleave à l\'ouest',
           ja: '西の横',
           cn: '左 (西) 两侧',
           ko: '서쪽 칼 휘두르기',
@@ -668,11 +599,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Northerly Shift Cape',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '69FD',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '69FD', source: 'Hesperos', capture: false }),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -688,17 +615,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Easterly Shift Cape',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '69FF',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '69FF', source: 'Hesperos', capture: false }),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'East Cape',
           de: 'Rückstoß -> Geh in den Osten',
-          fr: "Poussée à l'est",
+          fr: 'Poussée à l\'est',
           ja: '東でノックバック',
           cn: '右 (东) 击退',
           ko: '동쪽 망토',
@@ -708,11 +631,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Southerly Shift Cape',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '69FE',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '69FE', source: 'Hesperos', capture: false }),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -728,17 +647,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Westerly Shift Cape',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '6A00',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '6A00', source: 'Hesperos', capture: false }),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
           en: 'West Cape',
           de: 'Rückstoß -> Geh in den Westen',
-          fr: "Poussée à l'ouest",
+          fr: 'Poussée à l\'ouest',
           ja: '西でノックバック',
           cn: '左 (西) 击退',
           ko: '서쪽 망토',
@@ -749,32 +664,24 @@ const triggerSet: TriggerSet<Data> = {
       id: 'P4S Directional Shift Knockback',
       // Callout Knockback during Levinstrike + Shift
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: ['69FD', '69FE', '69FF', '6A00'],
-        source: 'Hesperos',
-      }),
+      netRegex: NetRegexes.startsUsing({ id: ['69FD', '69FE', '69FF', '6A00'], source: 'Hesperos' }),
       condition: (data) => !data.wellShiftKnockback,
       delaySeconds: (_data, matches) => parseFloat(matches.castTime) - 5,
       response: Responses.knockback(),
-      run: (data) => (data.wellShiftKnockback = false),
+      run: (data) => data.wellShiftKnockback = false,
     },
     {
       id: 'P4S Acting Role',
       type: 'GainsEffect',
-      netRegex: NetRegexes.gainsEffect({
-        effectId: ['B6D', 'B6E', 'B6F'],
-        capture: true,
-      }),
+      netRegex: NetRegexes.gainsEffect({ effectId: ['B6D', 'B6E', 'B6F'], capture: true }),
       condition: Conditions.targetIsYou(),
       infoText: (data, matches, output) => {
         const actingRoles: { [effectId: string]: string } = {
-          B6D: output.dps!(),
-          B6E: output.healer!(),
-          B6F: output.tank!(),
+          'B6D': output.dps!(),
+          'B6E': output.healer!(),
+          'B6F': output.tank!(),
         };
-        return output.text!({
-          actingRole: (data.actingRole = actingRoles[matches.effectId]),
-        });
+        return output.text!({ actingRole: data.actingRole = actingRoles[matches.effectId] });
       },
       outputStrings: {
         text: {
@@ -807,11 +714,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Belone Bursts',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '69D9',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '69D9', source: 'Hesperos', capture: false }),
       infoText: (_data, _matches, output) => output.rolePositions!(),
       outputStrings: {
         rolePositions: {
@@ -827,10 +730,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Periaktoi',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: ['69F5', '69F6', '69F7', '69F8'],
-        source: 'Hesperos',
-      }),
+      netRegex: NetRegexes.startsUsing({ id: ['69F5', '69F6', '69F7', '69F8'], source: 'Hesperos' }),
       alertText: (_data, matches, output) => {
         const pinax: { [id: string]: string } = {
           '69F5': output.acid!(),
@@ -886,20 +786,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Searing Stream',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '6A2D',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '6A2D', source: 'Hesperos', capture: false }),
       response: Responses.aoe(),
     },
     {
       id: 'P4S Act Tracker',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: ['6A0C', '6EB[4-7]', '6A36'],
-        source: 'Hesperos',
-      }),
+      netRegex: NetRegexes.startsUsing({ id: ['6A0C', '6EB[4-7]', '6A36'], source: 'Hesperos' }),
       run: (data, matches) => {
         const actMap: { [id: string]: string } = {
           '6A0C': '1',
@@ -938,20 +831,13 @@ const triggerSet: TriggerSet<Data> = {
         }
         const combatantDataLength = combatantData.combatants.length;
         if (combatantDataLength < 8) {
-          console.error(
-            `Hesperos: expected at least 8 combatants got ${combatantDataLength}`
-          );
+          console.error(`Hesperos: expected at least 8 combatants got ${combatantDataLength}`);
           return;
         }
 
         // the lowest eight Hesperos IDs are the thorns that tether the boss
-        const sortCombatants = (
-          a: PluginCombatantState,
-          b: PluginCombatantState
-        ) => (a.ID ?? 0) - (b.ID ?? 0);
-        const sortedCombatantData = combatantData.combatants
-          .sort(sortCombatants)
-          .splice(combatantDataLength - 8, combatantDataLength);
+        const sortCombatants = (a: PluginCombatantState, b: PluginCombatantState) => (a.ID ?? 0) - (b.ID ?? 0);
+        const sortedCombatantData = combatantData.combatants.sort(sortCombatants).splice(combatantDataLength - 8, combatantDataLength);
 
         sortedCombatantData.forEach((combatant: PluginCombatantState) => {
           (data.thornIds ??= []).push(combatant.ID ?? 0);
@@ -966,9 +852,7 @@ const triggerSet: TriggerSet<Data> = {
       // Tethers come out Cardinals (0 seconds), (3s) Towers, (6s) Other Cardinals
       suppressSeconds: 7,
       infoText: (data, matches, output) => {
-        const thorn = (data.thornIds ??= []).indexOf(
-          parseInt(matches.sourceId, 16)
-        );
+        const thorn = (data.thornIds ??= []).indexOf(parseInt(matches.sourceId, 16));
         const thornMap: { [thorn: number]: string } = {
           4: output.text!({ dir1: output.north!(), dir2: output.south!() }),
           5: output.text!({ dir1: output.north!(), dir2: output.south!() }),
@@ -995,18 +879,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Nearsight',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '6A26',
-        source: 'Hesperos',
-        capture: false,
-      }),
-      alertText: (data, _matches, output) =>
-        data.role === 'tank' ? output.tankbustersIn!() : output.getOut!(),
+      netRegex: NetRegexes.startsUsing({ id: '6A26', source: 'Hesperos', capture: false }),
+      alertText: (data, _matches, output) => data.role === 'tank' ? output.tankbustersIn!() : output.getOut!(),
       outputStrings: {
         tankbustersIn: {
           en: 'In (Tankbusters)',
           de: 'Rein (Tankbusters)',
-          fr: "À l'intérieur (Tank busters)",
+          fr: 'À l\'intérieur (Tank busters)',
           ja: 'タンク近づく',
           cn: '靠近 (坦克死刑)',
           ko: '안쪽으로 (탱버)',
@@ -1017,18 +896,13 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Farsight',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '6A27',
-        source: 'Hesperos',
-        capture: false,
-      }),
-      alertText: (data, _matches, output) =>
-        data.role === 'tank' ? output.tankbustersOut!() : output.getIn!(),
+      netRegex: NetRegexes.startsUsing({ id: '6A27', source: 'Hesperos', capture: false }),
+      alertText: (data, _matches, output) => data.role === 'tank' ? output.tankbustersOut!() : output.getIn!(),
       outputStrings: {
         tankbustersOut: {
           en: 'Out (Tankbusters)',
           de: 'Raus, Tankbuster',
-          fr: "À l'extérieur (Tank busters)",
+          fr: 'À l\'extérieur (Tank busters)',
           ja: 'タンク離れる',
           cn: '远离 (坦克死刑)',
           ko: '바깥쪽으로 (탱버)',
@@ -1051,9 +925,7 @@ const triggerSet: TriggerSet<Data> = {
       // Tethers come out Cardinals (0 seconds), (3s) Other Cardinals
       suppressSeconds: 4,
       infoText: (data, matches, output) => {
-        const thorn = (data.thornIds ??= []).indexOf(
-          parseInt(matches.sourceId, 16)
-        );
+        const thorn = (data.thornIds ??= []).indexOf(parseInt(matches.sourceId, 16));
         const thornMap: { [thorn: number]: string } = {
           0: output.text!({ dir1: output.north!(), dir2: output.south!() }),
           1: output.text!({ dir1: output.north!(), dir2: output.south!() }),
@@ -1087,11 +959,7 @@ const triggerSet: TriggerSet<Data> = {
       netRegex: NetRegexes.headMarker({}),
       condition: (data) => data.act !== undefined,
       run: (data, matches) => {
-        data.actHeadmarkers[matches.target] = getHeadmarkerId(
-          data,
-          matches,
-          orangeMarker
-        );
+        data.actHeadmarkers[matches.target] = getHeadmarkerId(data, matches, orangeMarker);
       },
     },
     {
@@ -1100,25 +968,18 @@ const triggerSet: TriggerSet<Data> = {
       netRegex: NetRegexes.tether({ id: '00AC' }),
       condition: (data) => data.act === '2',
       alertText: (data, matches, output) => {
-        if (matches.target !== data.me && matches.source !== data.me) return;
+        if (matches.target !== data.me && matches.source !== data.me)
+          return;
 
         // Only the healer gets a purple headmarker, and the tethered tank does not.
-        const id =
-          data.actHeadmarkers[matches.source] ??
-          data.actHeadmarkers[matches.target];
+        const id = data.actHeadmarkers[matches.source] ?? data.actHeadmarkers[matches.target];
 
         if (id === undefined) {
-          console.error(
-            `Act 2 Tether: missing headmarker: ${JSON.stringify(
-              data.actHeadmarkers
-            )}`
-          );
+          console.error(`Act 2 Tether: missing headmarker: ${JSON.stringify(data.actHeadmarkers)}`);
           return;
         }
 
-        const other = data.ShortName(
-          matches.target === data.me ? matches.source : matches.target
-        );
+        const other = data.ShortName(matches.target === data.me ? matches.source : matches.target);
         return {
           '012D': output.purpleTether!({ player: other }),
           '012E': output.greenTether!({ player: other }),
@@ -1157,10 +1018,8 @@ const triggerSet: TriggerSet<Data> = {
       type: 'Tether',
       // Tether comes after the headmarker color.
       netRegex: NetRegexes.tether({ id: '00A[CD]', source: 'Hesperos' }),
-      condition: (data, matches) =>
-        data.act === '4' && matches.target === data.me,
-      durationSeconds: (data, matches) =>
-        data.actHeadmarkers[matches.target] === '012D' ? 12 : 9,
+      condition: (data, matches) => data.act === '4' && matches.target === data.me,
+      durationSeconds: (data, matches) => data.actHeadmarkers[matches.target] === '012D' ? 12 : 9,
       suppressSeconds: 9999,
       promise: async (data, matches) => {
         const result = await callOverlayHandler({
@@ -1220,11 +1079,14 @@ const triggerSet: TriggerSet<Data> = {
         };
 
         const id = data.actHeadmarkers[matches.target];
-        if (id === undefined) return;
+        if (id === undefined)
+          return;
 
         if (data.actFourThorn === undefined) {
-          if (id === '012C') return { infoText: output.blueTether!() };
-          if (id === '012D') return { alertText: output.purpleTether!() };
+          if (id === '012C')
+            return { infoText: output.blueTether!() };
+          if (id === '012D')
+            return { alertText: output.purpleTether!() };
           return;
         }
 
@@ -1233,19 +1095,18 @@ const triggerSet: TriggerSet<Data> = {
         const x = data.actFourThorn.PosX - centerX;
         const y = data.actFourThorn.PosY - centerY;
         // Dirs: N = 0, NE = 1, ..., NW = 7
-        const thornDir = Math.round(4 - (4 * Math.atan2(x, y)) / Math.PI) % 8;
+        const thornDir = Math.round(4 - 4 * Math.atan2(x, y) / Math.PI) % 8;
 
-        const dirStr: string =
-          {
-            0: output.dirN!(),
-            1: output.dirNE!(),
-            2: output.dirE!(),
-            3: output.dirSE!(),
-            4: output.dirS!(),
-            5: output.dirSW!(),
-            6: output.dirW!(),
-            7: output.dirNW!(),
-          }[thornDir] ?? output.unknown!();
+        const dirStr: string = {
+          0: output.dirN!(),
+          1: output.dirNE!(),
+          2: output.dirE!(),
+          3: output.dirSE!(),
+          4: output.dirS!(),
+          5: output.dirSW!(),
+          6: output.dirW!(),
+          7: output.dirNW!(),
+        }[thornDir] ?? output.unknown!();
 
         if (id === '012C')
           return { infoText: output.blueTetherDir!({ dir: dirStr }) };
@@ -1256,11 +1117,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Ultimate Impulse',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '6A2C',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '6A2C', source: 'Hesperos', capture: false }),
       response: Responses.bigAoe(),
     },
     {
@@ -1271,9 +1128,7 @@ const triggerSet: TriggerSet<Data> = {
       // Tethers come out East or West (0 seconds), (3s) Middle knockack, (6) Opposite Cardinal
       suppressSeconds: 7,
       infoText: (data, matches, output) => {
-        const thorn = (data.thornIds ??= []).indexOf(
-          parseInt(matches.sourceId, 16)
-        );
+        const thorn = (data.thornIds ??= []).indexOf(parseInt(matches.sourceId, 16));
 
         const thornMapDirs: { [thorn: number]: string } = {
           0: 'east',
@@ -1287,13 +1142,13 @@ const triggerSet: TriggerSet<Data> = {
         };
 
         data.jumpDir1 = thornMapDirs[thorn];
-        return output[(thornMapDirs[thorn] ??= 'unknown')]!();
+        return output[thornMapDirs[thorn] ??= 'unknown']!();
       },
       outputStrings: {
         text: {
           en: 'Bait Jump ${dir1} first',
           de: 'Köder Sprung ${dir1} zuerst',
-          fr: "Attirez le saut à l'${dir1} en premier",
+          fr: 'Attirez le saut à l\'${dir1} en premier',
           ja: 'ジャンプ誘導: ${dir1}',
           cn: '引导跳跃 先去 ${dir1}',
           ko: '점프 유도: ${dir1} 먼저',
@@ -1313,11 +1168,7 @@ const triggerSet: TriggerSet<Data> = {
     {
       id: 'P4S Wreath of Thorns 5',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '6A34',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '6A34', source: 'Hesperos', capture: false }),
       infoText: (_data, _matches, output) => output.text!(),
       outputStrings: {
         text: {
@@ -1340,7 +1191,6 @@ const triggerSet: TriggerSet<Data> = {
       // ~22.3 seconds between #1 Fleeting Impulse (6A1C) to #1 Hemitheos's Thunder III (6A0E)
       // ~21.2 seconds between #8 Fleeting Impulse (6A1C) to #8 Hemitheos's Thunder III (6A0E).
       // Split the difference with 22 seconds.
-      suppressSeconds: 1,
       durationSeconds: 22,
       alertText: (data, matches, output) => {
         if (matches.target === data.me)
@@ -1363,15 +1213,13 @@ const triggerSet: TriggerSet<Data> = {
       type: 'GainsEffect',
       netRegex: NetRegexes.gainsEffect({ effectId: 'AF4', capture: true }),
       condition: (data, matches) => {
-        return data.me === matches.target && data.act === 'curtain';
+        return (data.me === matches.target && data.act === 'curtain');
       },
       response: (data, matches, output) => {
         // cactbot-builtin-response
         output.responseOutputStrings = curtainCallOutputStrings;
 
-        data.curtainCallGroup = Math.ceil(
-          (parseFloat(matches.duration) - 2) / 10
-        );
+        data.curtainCallGroup = Math.ceil(((parseFloat(matches.duration)) - 2) / 10);
 
         if (data.curtainCallGroup === 1)
           return { alarmText: output.group!({ num: data.curtainCallGroup }) };
@@ -1384,8 +1232,7 @@ const triggerSet: TriggerSet<Data> = {
       type: 'GainsEffect',
       netRegex: NetRegexes.gainsEffect({ effectId: 'B7D', capture: true }),
       condition: (data) => data.act === 'curtain',
-      preRun: (data) =>
-        (data.curtainCallTracker = (data.curtainCallTracker ?? 0) + 1),
+      preRun: (data) => data.curtainCallTracker = (data.curtainCallTracker ?? 0) + 1,
       delaySeconds: (_data, matches) => parseFloat(matches.duration),
       suppressSeconds: 1,
       infoText: (data, _matches, output) => {
@@ -1406,13 +1253,9 @@ const triggerSet: TriggerSet<Data> = {
       outputStrings: curtainCallOutputStrings,
     },
     {
-      id: "P4S Hell's Sting",
+      id: 'P4S Hell\'s Sting',
       type: 'StartsUsing',
-      netRegex: NetRegexes.startsUsing({
-        id: '6A1E',
-        source: 'Hesperos',
-        capture: false,
-      }),
+      netRegex: NetRegexes.startsUsing({ id: '6A1E', source: 'Hesperos', capture: false }),
       infoText: (_data, _matches, output) => output.protean!(),
       outputStrings: {
         protean: {
@@ -1428,8 +1271,8 @@ const triggerSet: TriggerSet<Data> = {
   ],
   timelineReplace: [
     {
-      locale: 'en',
-      replaceText: {
+      'locale': 'en',
+      'replaceText': {
         'Well Pinax/Levinstrike Pinax': 'Well/Levinstrike Pinax',
         'Levinstrike Pinax/Well Pinax': 'Levinstrike/Well Pinax',
         'Acid Pinax/Lava Pinax': 'Acid/Lava Pinax',
@@ -1437,11 +1280,11 @@ const triggerSet: TriggerSet<Data> = {
       },
     },
     {
-      locale: 'de',
-      replaceSync: {
-        Hesperos: 'Hesperos',
+      'locale': 'de',
+      'replaceSync': {
+        'Hesperos': 'Hesperos',
       },
-      replaceText: {
+      'replaceText': {
         '--debuffs--': '--Debuffs--',
         '--element debuffs--': '--Elementar-Debuffs--',
         '--role debuffs--': '--Rollen-Debuffs--',
@@ -1455,33 +1298,33 @@ const triggerSet: TriggerSet<Data> = {
         'Akanthai: Finale': 'Akanthai: Finale',
         'Belone Bursts': 'Berstendes Belone',
         'Belone Coils': 'Gewundenes Belone',
-        Bloodrake: 'Blutharke',
+        'Bloodrake': 'Blutharke',
         '(?<!Belone )Burst': 'Explosion',
         'Cursed Casting': 'Fluches Frucht',
         'Dark Design': 'Finsteres Formen',
-        Decollation: 'Enthauptung',
+        'Decollation': 'Enthauptung',
         'Demigod Double': 'Hemitheischer Hieb',
-        "Director's Belone": 'Maskiertes Belone',
+        'Director\'s Belone': 'Maskiertes Belone',
         'Directional Shift': 'Himmelsrichtung-Schwingen',
         'Elegant Evisceration': 'Adrette Ausweidung',
         'Elemental Belone': 'Elementares Belone',
-        Farsight: 'Blick in die Ferne',
+        'Farsight': 'Blick in die Ferne',
         'Fleeting Impulse': 'Flüchtiger Impuls',
         'Heart Stake': 'Herzenspfahl',
-        "Hell's Sting": 'Höllenstich',
-        "Hemitheos's Aero III": 'Hemitheisches Windga',
-        "Hemitheos's Dark IV": 'Hemitheisches Nachtka',
-        "Hemitheos's Fire III": 'Hemitheisches Feuga',
-        "Hemitheos's Fire IV": 'Hemitheisches Feuka',
-        "Hemitheos's Thunder III": 'Hemitheisches Blitzga',
-        "Hemitheos's Water IV": 'Hemitheisches Aquaka',
+        'Hell\'s Sting': 'Höllenstich',
+        'Hemitheos\'s Aero III': 'Hemitheisches Windga',
+        'Hemitheos\'s Dark IV': 'Hemitheisches Nachtka',
+        'Hemitheos\'s Fire III': 'Hemitheisches Feuga',
+        'Hemitheos\'s Fire IV': 'Hemitheisches Feuka',
+        'Hemitheos\'s Thunder III': 'Hemitheisches Blitzga',
+        'Hemitheos\'s Water IV': 'Hemitheisches Aquaka',
         'Inversive Chlamys': 'Invertierte Chlamys',
         'Kothornos Kick': 'Kothornoi-Tritt',
         'Kothornos Quake': 'Kothornoi-Beben',
         'Lava Pinax': 'Lava-Pinax',
         'Levinstrike Pinax': 'Donner-Pinax',
-        Nearsight: 'Blick nach innen',
-        Periaktoi: 'Periaktoi',
+        'Nearsight': 'Blick nach innen',
+        'Periaktoi': 'Periaktoi',
         '(?<!\\w )Pinax': 'Pinax',
         'Searing Stream': 'Sengender Strom',
         'Setting the Scene': 'Vorhang auf',
@@ -1493,17 +1336,17 @@ const triggerSet: TriggerSet<Data> = {
       },
     },
     {
-      locale: 'fr',
-      replaceSync: {
-        Hesperos: 'Hespéros',
+      'locale': 'fr',
+      'replaceSync': {
+        'Hesperos': 'Hespéros',
       },
-      replaceText: {
+      'replaceText': {
         '--debuffs--': '--debuffs--',
-        '--element debuffs--': "--debuffs d'éléments--",
+        '--element debuffs--': '--debuffs d\'éléments--',
         '--role debuffs--': '--debuffs de rôles--',
         '(?<!/)Acid Pinax(?!/)': 'Pinax de poison',
         'Acid Pinax/Lava Pinax': 'Pinax de poison/feu',
-        'Aetheric Chlamys': "Chlamyde d'éther",
+        'Aetheric Chlamys': 'Chlamyde d\'éther',
         'Akanthai: Act 1': 'La Tragédie des épines : acte I',
         'Akanthai: Act 2': 'La Tragédie des épines : acte II',
         'Akanthai: Act 3': 'La Tragédie des épines : acte III',
@@ -1512,25 +1355,25 @@ const triggerSet: TriggerSet<Data> = {
         'Akanthai: Finale': 'La Tragédie des épines : acte final',
         'Belone Bursts': 'Bélos enchanté : explosion',
         'Belone Coils': 'Bélos enchanté : rotation',
-        Bloodrake: 'Racle de sang',
+        'Bloodrake': 'Racle de sang',
         '(?<!Belone )Burst': 'Explosion',
         'Cursed Casting': 'Malédiction immortelle',
         'Dark Design': 'Dessein noir',
-        Decollation: 'Décollation',
+        'Decollation': 'Décollation',
         'Demigod Double': 'Gémellité du demi-dieu',
         'Directional Shift': 'Frappe mouvante vers un cardinal',
-        "Director's Belone": 'Bélos enchanté : persona',
+        'Director\'s Belone': 'Bélos enchanté : persona',
         'Elegant Evisceration': 'Éviscération élégante',
         'Elemental Belone': 'Bélos enchanté : élémentaire',
         'Fleeting Impulse': 'Impulsion fugace',
         'Heart Stake': 'Pieu dans le cœur',
-        "Hell's Sting": 'Pointe infernale',
-        "Hemitheos's Aero III": "Méga Vent de l'hémithéos",
-        "Hemitheos's Dark IV": "Giga Ténèbres de l'hémithéos",
-        "Hemitheos's Fire III": "Méga Feu de l'hémithéos",
-        "Hemitheos's Fire IV": "Giga Feu de l'hémithéos",
-        "Hemitheos's Thunder III": "Méga Foudre de l'hémithéos",
-        "Hemitheos's Water IV": "Giga Eau de l'hémithéos",
+        'Hell\'s Sting': 'Pointe infernale',
+        'Hemitheos\'s Aero III': 'Méga Vent de l\'hémithéos',
+        'Hemitheos\'s Dark IV': 'Giga Ténèbres de l\'hémithéos',
+        'Hemitheos\'s Fire III': 'Méga Feu de l\'hémithéos',
+        'Hemitheos\'s Fire IV': 'Giga Feu de l\'hémithéos',
+        'Hemitheos\'s Thunder III': 'Méga Foudre de l\'hémithéos',
+        'Hemitheos\'s Water IV': 'Giga Eau de l\'hémithéos',
         'Inversive Chlamys': 'Chlamyde retournée',
         'Kothornos Kick': 'Coup de cothurne',
         'Kothornos Quake': 'Piétinement de cothurne',
@@ -1539,25 +1382,25 @@ const triggerSet: TriggerSet<Data> = {
         '(?<!/)Levinstrike Pinax(?!/)': 'Pinax de foudre',
         'Levinstrike Pinax/Well Pinax': 'Pinax de foudre/eau',
         'Nearsight/Farsight': 'Frappe introspéctive/visionnaire',
-        Periaktoi: 'Périacte',
+        'Periaktoi': 'Périacte',
         '(?<!\\w )Pinax': 'Pinax',
         'Searing Stream': 'Flux ardent',
         'Setting the Scene': 'Lever de rideau',
         'Shifting Strike': 'Frappe mouvante',
         'Ultimate Impulse': 'Impulsion ultime',
         'Vengeful Belone': 'Bélos enchanté : vengeance',
-        '(?<!/)Well Pinax(?!/)': "Pinax d'eau",
-        'Well Pinax/Levinstrike Pinax': "Pinax d'eau/foudre",
-        'Wreath of Thorns': "Haie d'épines",
+        '(?<!/)Well Pinax(?!/)': 'Pinax d\'eau',
+        'Well Pinax/Levinstrike Pinax': 'Pinax d\'eau/foudre',
+        'Wreath of Thorns': 'Haie d\'épines',
       },
     },
     {
-      locale: 'ja',
-      missingTranslations: true,
-      replaceSync: {
-        Hesperos: 'ヘスペロス',
+      'locale': 'ja',
+      'missingTranslations': true,
+      'replaceSync': {
+        'Hesperos': 'ヘスペロス',
       },
-      replaceText: {
+      'replaceText': {
         'Acid Pinax': 'ピナクスポイズン',
         'Aetheric Chlamys': 'エーテルクラミュス',
         'Akanthai: Act 1': '茨の悲劇：序幕',
@@ -1568,29 +1411,29 @@ const triggerSet: TriggerSet<Data> = {
         'Akanthai: Finale': '茨の悲劇：終幕',
         'Belone Bursts': 'エンチャンテッドペロネー：エクスプロージョン',
         'Belone Coils': 'エンチャンテッドペロネー：ラウンド',
-        Bloodrake: 'ブラッドレイク',
+        'Bloodrake': 'ブラッドレイク',
         '(?<!Belone )Burst': '爆発',
         'Cursed Casting': '呪詛発動',
         'Dark Design': 'ダークデザイン',
-        Decollation: 'デコレーション',
-        "Director's Belone": 'エンチャンテッドペロネー：ペルソナ',
+        'Decollation': 'デコレーション',
+        'Director\'s Belone': 'エンチャンテッドペロネー：ペルソナ',
         'Elegant Evisceration': 'エレガントイヴィセレーション',
         'Elemental Belone': 'エンチャンテッドペロネー：エレメンタル',
         'Fleeting Impulse': 'フリーティングインパルス',
         'Heart Stake': 'ハートステイク',
-        "Hell's Sting": 'ヘルスティング',
-        "Hemitheos's Aero III": 'ヘーミテオス・エアロガ',
-        "Hemitheos's Dark IV": 'ヘーミテオス・ダージャ',
-        "Hemitheos's Fire III": 'ヘーミテオス・ファイガ',
-        "Hemitheos's Fire IV": 'ヘーミテオス・ファイジャ',
-        "Hemitheos's Thunder III": 'ヘーミテオス・サンダガ',
-        "Hemitheos's Water IV": 'ヘーミテオス・ウォタジャ',
+        'Hell\'s Sting': 'ヘルスティング',
+        'Hemitheos\'s Aero III': 'ヘーミテオス・エアロガ',
+        'Hemitheos\'s Dark IV': 'ヘーミテオス・ダージャ',
+        'Hemitheos\'s Fire III': 'ヘーミテオス・ファイガ',
+        'Hemitheos\'s Fire IV': 'ヘーミテオス・ファイジャ',
+        'Hemitheos\'s Thunder III': 'ヘーミテオス・サンダガ',
+        'Hemitheos\'s Water IV': 'ヘーミテオス・ウォタジャ',
         'Inversive Chlamys': 'インヴァースクラミュス',
         'Kothornos Kick': 'コトルヌスキック',
         'Kothornos Quake': 'コトルヌスクエイク',
         'Lava Pinax': 'ピナクスラーヴァ',
         'Levinstrike Pinax': 'ピナクスサンダー',
-        Periaktoi: 'ペリアクトイ',
+        'Periaktoi': 'ペリアクトイ',
         '(?<!\\w )Pinax': 'ピナクス',
         'Searing Stream': 'シアリングストリーム',
         'Setting the Scene': '劇場創造',
@@ -1602,11 +1445,11 @@ const triggerSet: TriggerSet<Data> = {
       },
     },
     {
-      locale: 'cn',
-      replaceSync: {
-        Hesperos: '赫斯珀洛斯',
+      'locale': 'cn',
+      'replaceSync': {
+        'Hesperos': '赫斯珀洛斯',
       },
-      replaceText: {
+      'replaceText': {
         '--debuffs--': '--Debuff--',
         '--element debuffs--': '--元素Debuff--',
         '--role debuffs--': '--职能Debuff--',
@@ -1620,33 +1463,33 @@ const triggerSet: TriggerSet<Data> = {
         'Akanthai: Finale': '荆棘悲剧：结幕',
         'Belone Bursts': '附魔佩罗涅·爆炸',
         'Belone Coils': '附魔佩罗涅·场地',
-        Bloodrake: '聚血',
+        'Bloodrake': '聚血',
         '(?<!Belone )Burst': '爆炸',
         'Cursed Casting': '诅咒发动',
         'Dark Design': '黑暗设计',
-        Decollation: '断头',
+        'Decollation': '断头',
         'Demigod Double': '半神双击',
-        "Director's Belone": '附魔佩罗涅·职责',
+        'Director\'s Belone': '附魔佩罗涅·职责',
         'Directional Shift': '换位强袭·方位',
         'Elegant Evisceration': '优雅除脏',
         'Elemental Belone': '附魔佩罗涅·元素',
-        Farsight: '远见的魔击',
+        'Farsight': '远见的魔击',
         'Fleeting Impulse': '闪现脉冲',
         'Heart Stake': '刺心桩',
-        "Hell's Sting": '地狱苦痛',
-        "Hemitheos's Aero III": '半神暴风',
-        "Hemitheos's Dark IV": '半神冥暗',
-        "Hemitheos's Fire III": '半神爆炎',
-        "Hemitheos's Fire IV": '半神炽炎',
-        "Hemitheos's Thunder III": '半神暴雷',
-        "Hemitheos's Water IV": '半神骇水',
+        'Hell\'s Sting': '地狱苦痛',
+        'Hemitheos\'s Aero III': '半神暴风',
+        'Hemitheos\'s Dark IV': '半神冥暗',
+        'Hemitheos\'s Fire III': '半神爆炎',
+        'Hemitheos\'s Fire IV': '半神炽炎',
+        'Hemitheos\'s Thunder III': '半神暴雷',
+        'Hemitheos\'s Water IV': '半神骇水',
         'Inversive Chlamys': '翻转斗篷',
         'Kothornos Kick': '舞台靴重踢',
         'Kothornos Quake': '舞台靴踏地',
         'Lava Pinax': '熔岩板画',
         'Levinstrike Pinax': '雷电板画',
-        Nearsight: '近思的魔击',
-        Periaktoi: '场景旋转',
+        'Nearsight': '近思的魔击',
+        'Periaktoi': '场景旋转',
         '(?<!\\w )Pinax': '板画',
         'Searing Stream': '灼热流',
         'Setting the Scene': '布置剧场',
@@ -1658,11 +1501,11 @@ const triggerSet: TriggerSet<Data> = {
       },
     },
     {
-      locale: 'ko',
-      replaceSync: {
-        Hesperos: '헤스페로스',
+      'locale': 'ko',
+      'replaceSync': {
+        'Hesperos': '헤스페로스',
       },
-      replaceText: {
+      'replaceText': {
         '--debuffs--': '--디버프--',
         '--element debuffs--': '--속성 디버프--',
         '--role debuffs--': '--역할 디버프--',
@@ -1677,26 +1520,26 @@ const triggerSet: TriggerSet<Data> = {
         'Akanthai: Finale': '가시의 비극: 종막',
         'Belone Bursts': '마법검 벨로네: 폭발',
         'Belone Coils': '마법검 벨로네: 원형',
-        Bloodrake: '피갈퀴',
+        'Bloodrake': '피갈퀴',
         '(?<!Belone )Burst': '폭발',
         'Cursed Casting': '저주 발동',
         'Dark Design': '어둠 설계',
-        Decollation: '집단 참수',
+        'Decollation': '집단 참수',
         'Demigod Double': '반신의 쌍격',
-        "Director's Belone": '마법검 벨로네: 역할',
+        'Director\'s Belone': '마법검 벨로네: 역할',
         'Directional Shift': '이동 공격: 동서남북',
         'Elegant Evisceration': '우아한 적출',
         'Elemental Belone': '마법검 벨로네: 속성',
         'Fleeting Impulse': '순간 충격',
         'Heart Stake(?! )': '심장 말뚝',
         'Heart Stake OT': '심장 말뚝 2타',
-        "Hell's Sting": '지옥 할퀴기',
-        "Hemitheos's Aero III": '헤미테오스 에어로가',
-        "Hemitheos's Dark IV": '헤미테오스 다쟈',
-        "Hemitheos's Fire III": '헤미테오스 파이가',
-        "Hemitheos's Fire IV": '헤미테오스 파이쟈',
-        "Hemitheos's Thunder III": '헤미테오스 선더가',
-        "Hemitheos's Water IV": '헤미테오스 워터쟈',
+        'Hell\'s Sting': '지옥 할퀴기',
+        'Hemitheos\'s Aero III': '헤미테오스 에어로가',
+        'Hemitheos\'s Dark IV': '헤미테오스 다쟈',
+        'Hemitheos\'s Fire III': '헤미테오스 파이가',
+        'Hemitheos\'s Fire IV': '헤미테오스 파이쟈',
+        'Hemitheos\'s Thunder III': '헤미테오스 선더가',
+        'Hemitheos\'s Water IV': '헤미테오스 워터쟈',
         'Inversive Chlamys': '망토 휘두르기',
         'Kothornos Kick': '무대신 발길질',
         'Kothornos Quake': '무대신 땅울림',
@@ -1705,7 +1548,7 @@ const triggerSet: TriggerSet<Data> = {
         '(?<!/)Levinstrike Pinax(?!/)': '번개 배경판',
         'Levinstrike Pinax/Well Pinax': '번개/물기둥 배경판',
         'Nearsight/Farsight': '근거리/원거리 마격',
-        Periaktoi: '삼면 배경',
+        'Periaktoi': '삼면 배경',
         '(?<!\\w )Pinax': '배경판',
         'Searing Stream': '작열 기류',
         'Setting the Scene': '극장 창조',
