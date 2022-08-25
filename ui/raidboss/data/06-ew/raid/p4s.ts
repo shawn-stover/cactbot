@@ -1191,6 +1191,8 @@ const triggerSet: TriggerSet<Data> = {
       // ~22.3 seconds between #1 Fleeting Impulse (6A1C) to #1 Hemitheos's Thunder III (6A0E)
       // ~21.2 seconds between #8 Fleeting Impulse (6A1C) to #8 Hemitheos's Thunder III (6A0E).
       // Split the difference with 22 seconds.
+      // Suppression to prevent double hits from incrementing the counter twice.
+      suppressSeconds: 1,
       durationSeconds: 22,
       alertText: (data, matches, output) => {
         if (matches.target === data.me)
